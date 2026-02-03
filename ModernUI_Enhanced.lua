@@ -658,6 +658,12 @@ function Library:CreateWindow(config)
                 AutomaticSize = Enum.AutomaticSize.Y
             })
             
+            CreateElement("UIListLayout", {
+                Parent = SectionFrame,
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Padding = UDim.new(0, 5)
+            })
+            
             local SectionTitle = CreateElement("TextLabel", {
                 Name = "Title",
                 Parent = SectionFrame,
@@ -667,16 +673,17 @@ function Library:CreateWindow(config)
                 TextColor3 = Theme.Text,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                Font = Enum.Font.GothamBold
+                Font = Enum.Font.GothamBold,
+                LayoutOrder = 1
             })
             
             local ColumnContainer = CreateElement("Frame", {
                 Name = "Columns",
                 Parent = SectionFrame,
-                Position = UDim2.new(0, 0, 0, 30),
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundTransparency = 1,
-                AutomaticSize = Enum.AutomaticSize.Y
+                AutomaticSize = Enum.AutomaticSize.Y,
+                LayoutOrder = 2
             })
             
             local LeftColumn = CreateElement("Frame", {
