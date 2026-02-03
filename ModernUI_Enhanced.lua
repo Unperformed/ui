@@ -1,20 +1,14 @@
 --[[
     ════════════════════════════════════════════════════════════════════════
-    PROFESSIONAL ROBLOX UI LIBRARY - GRADIENT EDITION
-    Version: 3.1.0 (Gradient Update)
-    Features: Everything with Beautiful Gradient Backgrounds!
+    PROFESSIONAL ROBLOX UI LIBRARY - COMPLETE EDITION
+    Version: 3.0.0
+    Features: Everything a UI Library should have
     ════════════════════════════════════════════════════════════════════════
     
-    ✨ NEW IN V3.1 - GRADIENT EDITION:
-    ✓ Stunning gradient backgrounds on all UI elements
-    ✓ Each theme has unique gradient color schemes
-    ✓ Customizable gradient rotation per theme
-    ✓ Smooth gradient transitions on interactive elements
-    
-    FEATURES FROM V3.0:
+    NEW FEATURES IN V3.0:
     ✓ Color Pickers with RGB/HSV
     ✓ Keybind System
-    ✓ Multi-theme Support (6 gradient themes)
+    ✓ Multi-theme Support (6 themes)
     ✓ Element Locking System
     ✓ Labels, Dividers, Paragraphs
     ✓ Input Validation
@@ -34,28 +28,23 @@ local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 
 -- ════════════════════════════════════════════════════════════════════════
--- THEME PRESETS WITH GRADIENTS - EASILY CHANGE YOUR UI THEME HERE!
+-- THEME PRESETS - EASILY CHANGE YOUR UI THEME HERE!
 -- ════════════════════════════════════════════════════════════════════════
--- Each theme now includes gradient colors for stunning visual effects!
--- Gradient pairs (e.g., BackgroundGradient) create smooth color transitions
--- GradientRotation controls the angle of the gradient (0-360 degrees)
+
+-- ════════════════════════════════════════════════════════════════════════
+-- THEME PRESETS - UPDATED FOR BETTER IMMERSION
 -- ════════════════════════════════════════════════════════════════════════
 
 local ThemePresets = {
-    -- Deep Royal Purple with Gradient
+    -- Deep Royal Purple
     Purple = {
         Background = Color3.fromRGB(30, 30, 46),
-        BackgroundGradient = {Color3.fromRGB(30, 30, 46), Color3.fromRGB(45, 35, 65)},
         Secondary = Color3.fromRGB(45, 45, 65),
-        SecondaryGradient = {Color3.fromRGB(45, 45, 65), Color3.fromRGB(60, 50, 85)},
         Tertiary = Color3.fromRGB(55, 55, 80),
-        TertiaryGradient = {Color3.fromRGB(55, 55, 80), Color3.fromRGB(70, 65, 100)},
         Sidebar = Color3.fromRGB(24, 24, 37),
-        SidebarGradient = {Color3.fromRGB(24, 24, 37), Color3.fromRGB(35, 30, 55)},
         SidebarHover = Color3.fromRGB(35, 35, 55),
         SidebarActive = Color3.fromRGB(195, 126, 255),
         Accent = Color3.fromRGB(195, 126, 255),
-        AccentGradient = {Color3.fromRGB(195, 126, 255), Color3.fromRGB(150, 80, 220)},
         AccentHover = Color3.fromRGB(210, 160, 255),
         AccentDark = Color3.fromRGB(150, 80, 220),
         Text = Color3.fromRGB(245, 245, 250),
@@ -68,24 +57,18 @@ local ThemePresets = {
         Error = Color3.fromRGB(240, 71, 71),
         Info = Color3.fromRGB(52, 152, 219),
         ToggleOn = Color3.fromRGB(195, 126, 255),
-        ToggleOff = Color3.fromRGB(70, 70, 90),
-        GradientRotation = 45
+        ToggleOff = Color3.fromRGB(70, 70, 90)
     },
     
-    -- Vampire / Blood Red with Gradient
+    -- Vampire / Blood Red
     Red = {
         Background = Color3.fromRGB(20, 10, 10),
-        BackgroundGradient = {Color3.fromRGB(20, 10, 10), Color3.fromRGB(40, 5, 5)},
         Secondary = Color3.fromRGB(35, 15, 15),
-        SecondaryGradient = {Color3.fromRGB(35, 15, 15), Color3.fromRGB(55, 10, 10)},
         Tertiary = Color3.fromRGB(50, 20, 20),
-        TertiaryGradient = {Color3.fromRGB(50, 20, 20), Color3.fromRGB(70, 15, 15)},
         Sidebar = Color3.fromRGB(15, 5, 5),
-        SidebarGradient = {Color3.fromRGB(15, 5, 5), Color3.fromRGB(25, 8, 8)},
         SidebarHover = Color3.fromRGB(30, 10, 10),
         SidebarActive = Color3.fromRGB(220, 20, 60),
         Accent = Color3.fromRGB(220, 20, 60),
-        AccentGradient = {Color3.fromRGB(220, 20, 60), Color3.fromRGB(150, 10, 40)},
         AccentHover = Color3.fromRGB(255, 50, 90),
         AccentDark = Color3.fromRGB(150, 10, 40),
         Text = Color3.fromRGB(255, 235, 235),
@@ -98,24 +81,18 @@ local ThemePresets = {
         Error = Color3.fromRGB(240, 71, 71),
         Info = Color3.fromRGB(52, 152, 219),
         ToggleOn = Color3.fromRGB(220, 20, 60),
-        ToggleOff = Color3.fromRGB(60, 30, 30),
-        GradientRotation = 135
+        ToggleOff = Color3.fromRGB(60, 30, 30)
     },
     
-    -- Abyssal Ocean Blue with Gradient
+    -- Abyssal Ocean Blue
     Ocean = {
         Background = Color3.fromRGB(10, 15, 25),
-        BackgroundGradient = {Color3.fromRGB(10, 15, 25), Color3.fromRGB(5, 30, 50)},
         Secondary = Color3.fromRGB(20, 30, 45),
-        SecondaryGradient = {Color3.fromRGB(20, 30, 45), Color3.fromRGB(15, 45, 70)},
         Tertiary = Color3.fromRGB(30, 45, 65),
-        TertiaryGradient = {Color3.fromRGB(30, 45, 65), Color3.fromRGB(25, 60, 90)},
         Sidebar = Color3.fromRGB(5, 10, 20),
-        SidebarGradient = {Color3.fromRGB(5, 10, 20), Color3.fromRGB(10, 20, 35)},
         SidebarHover = Color3.fromRGB(15, 25, 40),
         SidebarActive = Color3.fromRGB(0, 200, 255),
         Accent = Color3.fromRGB(0, 200, 255),
-        AccentGradient = {Color3.fromRGB(0, 200, 255), Color3.fromRGB(0, 140, 200)},
         AccentHover = Color3.fromRGB(80, 230, 255),
         AccentDark = Color3.fromRGB(0, 140, 200),
         Text = Color3.fromRGB(230, 245, 255),
@@ -128,24 +105,18 @@ local ThemePresets = {
         Error = Color3.fromRGB(231, 76, 60),
         Info = Color3.fromRGB(52, 152, 219),
         ToggleOn = Color3.fromRGB(0, 200, 255),
-        ToggleOff = Color3.fromRGB(50, 70, 90),
-        GradientRotation = 90
+        ToggleOff = Color3.fromRGB(50, 70, 90)
     },
     
-    -- Terminal Matrix Green with Gradient
+    -- Terminal Matrix Green
     Matrix = {
         Background = Color3.fromRGB(5, 10, 5),
-        BackgroundGradient = {Color3.fromRGB(5, 10, 5), Color3.fromRGB(0, 20, 10)},
         Secondary = Color3.fromRGB(10, 20, 10),
-        SecondaryGradient = {Color3.fromRGB(10, 20, 10), Color3.fromRGB(5, 30, 15)},
         Tertiary = Color3.fromRGB(15, 30, 15),
-        TertiaryGradient = {Color3.fromRGB(15, 30, 15), Color3.fromRGB(10, 40, 20)},
         Sidebar = Color3.fromRGB(2, 5, 2),
-        SidebarGradient = {Color3.fromRGB(2, 5, 2), Color3.fromRGB(5, 15, 5)},
         SidebarHover = Color3.fromRGB(10, 15, 10),
         SidebarActive = Color3.fromRGB(0, 255, 65),
         Accent = Color3.fromRGB(0, 255, 65),
-        AccentGradient = {Color3.fromRGB(0, 255, 65), Color3.fromRGB(0, 180, 40)},
         AccentHover = Color3.fromRGB(100, 255, 130),
         AccentDark = Color3.fromRGB(0, 180, 40),
         Text = Color3.fromRGB(150, 255, 150),
@@ -158,24 +129,18 @@ local ThemePresets = {
         Error = Color3.fromRGB(255, 50, 50),
         Info = Color3.fromRGB(0, 150, 255),
         ToggleOn = Color3.fromRGB(0, 255, 65),
-        ToggleOff = Color3.fromRGB(20, 50, 20),
-        GradientRotation = 180
+        ToggleOff = Color3.fromRGB(20, 50, 20)
     },
     
-    -- Midnight Indigo with Gradient
+    -- Midnight Indigo
     Midnight = {
         Background = Color3.fromRGB(12, 12, 28),
-        BackgroundGradient = {Color3.fromRGB(12, 12, 28), Color3.fromRGB(20, 15, 45)},
         Secondary = Color3.fromRGB(25, 25, 45),
-        SecondaryGradient = {Color3.fromRGB(25, 25, 45), Color3.fromRGB(35, 30, 65)},
         Tertiary = Color3.fromRGB(35, 35, 60),
-        TertiaryGradient = {Color3.fromRGB(35, 35, 60), Color3.fromRGB(45, 40, 80)},
         Sidebar = Color3.fromRGB(8, 8, 20),
-        SidebarGradient = {Color3.fromRGB(8, 8, 20), Color3.fromRGB(15, 12, 35)},
         SidebarHover = Color3.fromRGB(20, 20, 40),
         SidebarActive = Color3.fromRGB(130, 115, 255),
         Accent = Color3.fromRGB(130, 115, 255),
-        AccentGradient = {Color3.fromRGB(130, 115, 255), Color3.fromRGB(90, 80, 220)},
         AccentHover = Color3.fromRGB(160, 150, 255),
         AccentDark = Color3.fromRGB(90, 80, 220),
         Text = Color3.fromRGB(240, 240, 255),
@@ -188,24 +153,18 @@ local ThemePresets = {
         Error = Color3.fromRGB(240, 71, 71),
         Info = Color3.fromRGB(52, 152, 219),
         ToggleOn = Color3.fromRGB(130, 115, 255),
-        ToggleOff = Color3.fromRGB(45, 45, 70),
-        GradientRotation = 60
+        ToggleOff = Color3.fromRGB(45, 45, 70)
     },
     
-    -- Warm Sunset Dusk with Gradient
+    -- Warm Sunset Dusk
     Sunset = {
         Background = Color3.fromRGB(25, 15, 15),
-        BackgroundGradient = {Color3.fromRGB(25, 15, 15), Color3.fromRGB(45, 20, 10)},
         Secondary = Color3.fromRGB(45, 25, 20),
-        SecondaryGradient = {Color3.fromRGB(45, 25, 20), Color3.fromRGB(65, 35, 15)},
         Tertiary = Color3.fromRGB(60, 35, 30),
-        TertiaryGradient = {Color3.fromRGB(60, 35, 30), Color3.fromRGB(80, 45, 20)},
         Sidebar = Color3.fromRGB(20, 10, 10),
-        SidebarGradient = {Color3.fromRGB(20, 10, 10), Color3.fromRGB(35, 15, 8)},
         SidebarHover = Color3.fromRGB(40, 20, 15),
         SidebarActive = Color3.fromRGB(255, 120, 60),
         Accent = Color3.fromRGB(255, 120, 60),
-        AccentGradient = {Color3.fromRGB(255, 120, 60), Color3.fromRGB(200, 80, 30)},
         AccentHover = Color3.fromRGB(255, 160, 100),
         AccentDark = Color3.fromRGB(200, 80, 30),
         Text = Color3.fromRGB(255, 245, 230),
@@ -218,8 +177,7 @@ local ThemePresets = {
         Error = Color3.fromRGB(240, 71, 71),
         Info = Color3.fromRGB(52, 152, 219),
         ToggleOn = Color3.fromRGB(255, 120, 60),
-        ToggleOff = Color3.fromRGB(80, 50, 40),
-        GradientRotation = 120
+        ToggleOff = Color3.fromRGB(80, 50, 40)
     }
 }
 
@@ -247,22 +205,6 @@ local function CreateElement(className, properties)
         element[property] = value
     end
     return element
-end
-
-local function AddGradient(element, gradientColors, rotation)
-    if not gradientColors or #gradientColors < 2 then return end
-    
-    local gradient = Instance.new("UIGradient")
-    gradient.Parent = element
-    gradient.Rotation = rotation or Theme.GradientRotation or 45
-    
-    local colorSequence = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, gradientColors[1]),
-        ColorSequenceKeypoint.new(1, gradientColors[2])
-    })
-    
-    gradient.Color = colorSequence
-    return gradient
 end
 
 local function IsMobile()
@@ -372,9 +314,6 @@ function Library:CreateWindow(config)
         ClipsDescendants = true
     })
     
-    -- Add gradient to MainFrame
-    AddGradient(MainFrame, Theme.BackgroundGradient)
-    
     CreateElement("UICorner", {
         Parent = MainFrame,
         CornerRadius = UDim.new(0, 10)
@@ -404,9 +343,6 @@ function Library:CreateWindow(config)
         BackgroundColor3 = Theme.Sidebar,
         BorderSizePixel = 0
     })
-    
-    -- Add gradient to TitleBar
-    AddGradient(TitleBar, Theme.SidebarGradient)
     
     CreateElement("UICorner", {
         Parent = TitleBar,
@@ -511,9 +447,6 @@ function Library:CreateWindow(config)
         BackgroundColor3 = Theme.Sidebar,
         BorderSizePixel = 0
     })
-    
-    -- Add gradient to Sidebar
-    AddGradient(Sidebar, Theme.SidebarGradient, 180)
     
     local SidebarList = CreateElement("UIListLayout", {
         Parent = Sidebar,
@@ -1040,9 +973,6 @@ function Library:CreateWindow(config)
                     BorderSizePixel = 0
                 })
                 
-                -- Add gradient to Toggle
-                AddGradient(Toggle, Theme.SecondaryGradient)
-                
                 CreateElement("UICorner", {
                     Parent = Toggle,
                     CornerRadius = UDim.new(0, 6)
@@ -1081,9 +1011,6 @@ function Library:CreateWindow(config)
                     AutoButtonColor = false
                 })
                 
-                -- Add gradient to Toggle Button
-                local ToggleButtonGradient = AddGradient(ToggleButton, currentValue and Theme.AccentGradient or nil)
-                
                 CreateElement("UICorner", {
                     Parent = ToggleButton,
                     CornerRadius = UDim.new(1, 0)
@@ -1108,15 +1035,6 @@ function Library:CreateWindow(config)
                     currentValue = value
                     Tween(ToggleButton, {BackgroundColor3 = value and Theme.ToggleOn or Theme.ToggleOff}, 0.2)
                     Tween(ToggleCircle, {Position = value and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}, 0.2)
-                    
-                    -- Update gradient
-                    if ToggleButtonGradient then
-                        ToggleButtonGradient:Destroy()
-                    end
-                    if value then
-                        ToggleButtonGradient = AddGradient(ToggleButton, Theme.AccentGradient)
-                    end
-                    
                     if not skipCallback then
                         pcall(Callback, value)
                     end
@@ -1201,9 +1119,6 @@ function Library:CreateWindow(config)
                     BorderSizePixel = 0
                 })
                 
-                -- Add gradient to Slider
-                AddGradient(Slider, Theme.SecondaryGradient)
-                
                 CreateElement("UICorner", {
                     Parent = Slider,
                     CornerRadius = UDim.new(0, 6)
@@ -1264,9 +1179,6 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Theme.Accent,
                     BorderSizePixel = 0
                 })
-                
-                -- Add gradient to slider fill
-                AddGradient(SliderFill, Theme.AccentGradient, 0)
                 
                 CreateElement("UICorner", {
                     Parent = SliderFill,
@@ -1398,9 +1310,6 @@ function Library:CreateWindow(config)
                     BorderSizePixel = 0,
                     ZIndex = 2
                 })
-                
-                -- Add gradient to Dropdown
-                AddGradient(Dropdown, Theme.SecondaryGradient)
                 
                 CreateElement("UICorner", {
                     Parent = Dropdown,
@@ -1654,9 +1563,6 @@ function Library:CreateWindow(config)
                     AutoButtonColor = false
                 })
                 
-                -- Add gradient to Button
-                local ButtonGradient = AddGradient(Button, Theme.SecondaryGradient)
-                
                 CreateElement("UICorner", {
                     Parent = Button,
                     CornerRadius = UDim.new(0, 6)
@@ -1761,9 +1667,6 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Theme.Secondary,
                     BorderSizePixel = 0
                 })
-                
-                -- Add gradient to Textbox
-                AddGradient(Textbox, Theme.SecondaryGradient)
                 
                 CreateElement("UICorner", {
                     Parent = Textbox,
@@ -2355,9 +2258,6 @@ function Library:CreateWindow(config)
             ZIndex = 1000
         })
         
-        -- Add gradient to Notification
-        AddGradient(Notification, Theme.SecondaryGradient)
-        
         CreateElement("UICorner", {
             Parent = Notification,
             CornerRadius = UDim.new(0, 8)
@@ -2377,11 +2277,6 @@ function Library:CreateWindow(config)
             BorderSizePixel = 0,
             ZIndex = 1001
         })
-        
-        -- Add subtle gradient to color bar
-        if Theme.AccentGradient then
-            AddGradient(ColorBar, Theme.AccentGradient, 90)
-        end
         
         CreateElement("UICorner", {
             Parent = ColorBar,
