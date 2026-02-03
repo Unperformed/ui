@@ -1266,16 +1266,22 @@ function Library:CreateWindow(config)
                     Font = Enum.Font.Gotham
                 })
                 
+                -- Create options container as floating overlay
                 local OptionsContainer = CreateElement("Frame", {
-                    Name = "Options",
-                    Parent = Dropdown,
-                    Position = UDim2.new(0, 0, 1, 5),
-                    Size = UDim2.new(1, 0, 0, 0),
+                    Name = "DropdownOptions",
+                    Parent = ScreenGui,
+                    Position = UDim2.new(0, 0, 0, 0),
+                    Size = UDim2.new(0, 0, 0, 0),
                     BackgroundColor3 = Theme.Tertiary,
                     BorderSizePixel = 0,
                     Visible = false,
                     ClipsDescendants = true,
-                    ZIndex = 100
+                    ZIndex = 500
+                })
+                
+                CreateElement("UICorner", {
+                    Parent = OptionsContainer,
+                    CornerRadius = UDim.new(0, 6)
                 })
                 
                 CreateElement("UIStroke", {
@@ -1283,11 +1289,6 @@ function Library:CreateWindow(config)
                     Color = Theme.Border,
                     Thickness = 1,
                     Transparency = 0.3
-                })
-                
-                CreateElement("UICorner", {
-                    Parent = OptionsContainer,
-                    CornerRadius = UDim.new(0, 6)
                 })
                 
                 CreateElement("UIListLayout", {
@@ -1310,18 +1311,54 @@ function Library:CreateWindow(config)
                     end
                 end
                 
+                local function UpdateOptionsPosition()
+                    local dropdownPos = Dropdown.AbsolutePosition
+                    local dropdownSize = Dropdown.AbsoluteSize
+                    OptionsContainer.Position = UDim2.new(0, dropdownPos.X, 0, dropdownPos.Y + dropdownSize.Y + 5)
+                    OptionsContainer.Size = UDim2.new(0, dropdownSize.X, 0, 0)
+                end
+                
                 DropdownButton.MouseButton1Click:Connect(function()
                     if not Locked then
                         isOpen = not isOpen
                         OptionsContainer.Visible = isOpen
                         
                         if isOpen then
+                            UpdateOptionsPosition()
                             local optionHeight = #Options * 32 + 10
-                            Tween(OptionsContainer, {Size = UDim2.new(1, 0, 0, optionHeight)}, 0.2)
+                            Tween(OptionsContainer, {Size = UDim2.new(0, Dropdown.AbsoluteSize.X, 0, optionHeight)}, 0.2)
                             Tween(DropdownArrow, {Rotation = 180}, 0.2)
                         else
-                            Tween(OptionsContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                            Tween(OptionsContainer, {Size = UDim2.new(0, Dropdown.AbsoluteSize.X, 0, 0)}, 0.2)
                             Tween(DropdownArrow, {Rotation = 0}, 0.2)
+                            task.wait(0.2)
+                            OptionsContainer.Visible = false
+                        end
+                    end
+                end)
+                
+                -- Close dropdown when clicking outside
+                UserInputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        if isOpen and OptionsContainer.Visible then
+                            local mousePos = input.Position
+                            local containerPos = OptionsContainer.AbsolutePosition
+                            local containerSize = OptionsContainer.AbsoluteSize
+                            local dropdownPos = Dropdown.AbsolutePosition
+                            local dropdownSize = Dropdown.AbsoluteSize
+                            
+                            local inDropdown = mousePos.X >= dropdownPos.X and mousePos.X <= dropdownPos.X + dropdownSize.X and
+                                             mousePos.Y >= dropdownPos.Y and mousePos.Y <= dropdownPos.Y + dropdownSize.Y
+                            local inContainer = mousePos.X >= containerPos.X and mousePos.X <= containerPos.X + containerSize.X and
+                                              mousePos.Y >= containerPos.Y and mousePos.Y <= containerPos.Y + containerSize.Y
+                            
+                            if not inDropdown and not inContainer then
+                                isOpen = false
+                                Tween(OptionsContainer, {Size = UDim2.new(0, Dropdown.AbsoluteSize.X, 0, 0)}, 0.2)
+                                Tween(DropdownArrow, {Rotation = 0}, 0.2)
+                                task.wait(0.2)
+                                OptionsContainer.Visible = false
+                            end
                         end
                     end
                 end)
@@ -1339,15 +1376,16 @@ function Library:CreateWindow(config)
                         TextXAlignment = Enum.TextXAlignment.Left,
                         Font = Enum.Font.Gotham,
                         AutoButtonColor = false,
-                        ZIndex = 101
+                        ZIndex = 501
                     })
                     
                     OptionButton.MouseButton1Click:Connect(function()
                         UpdateDropdown(option)
                         isOpen = false
-                        OptionsContainer.Visible = false
-                        Tween(OptionsContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        Tween(OptionsContainer, {Size = UDim2.new(0, Dropdown.AbsoluteSize.X, 0, 0)}, 0.2)
                         Tween(DropdownArrow, {Rotation = 0}, 0.2)
+                        task.wait(0.2)
+                        OptionsContainer.Visible = false
                     end)
                     
                     OptionButton.MouseEnter:Connect(function()
@@ -1667,17 +1705,17 @@ function Library:CreateWindow(config)
                     ZIndex = 3
                 })
                 
-                -- Color Picker Window
+                -- Color Picker Window as floating overlay
                 local PickerWindow = CreateElement("Frame", {
-                    Name = "PickerWindow",
-                    Parent = ColorPicker,
-                    Position = UDim2.new(0, 0, 1, 5),
-                    Size = UDim2.new(1, 0, 0, 0),
+                    Name = "ColorPickerWindow",
+                    Parent = ScreenGui,
+                    Position = UDim2.new(0, 0, 0, 0),
+                    Size = UDim2.new(0, 0, 0, 0),
                     BackgroundColor3 = Theme.Tertiary,
                     BorderSizePixel = 0,
                     Visible = false,
                     ClipsDescendants = true,
-                    ZIndex = 100
+                    ZIndex = 500
                 })
                 
                 CreateElement("UICorner", {
@@ -1700,7 +1738,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromHSV(h / 360, 1, 1),
                     BorderSizePixel = 0,
                     AutoButtonColor = false,
-                    ZIndex = 101
+                    ZIndex = 501
                 })
                 
                 CreateElement("UICorner", {
@@ -1724,7 +1762,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(0, 0, 0),
                     BackgroundTransparency = 0,
                     BorderSizePixel = 0,
-                    ZIndex = 102
+                    ZIndex = 502
                 })
                 
                 CreateElement("UICorner", {
@@ -1753,7 +1791,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BorderSizePixel = 2,
                     BorderColor3 = Color3.fromRGB(0, 0, 0),
-                    ZIndex = 105
+                    ZIndex = 505
                 })
                 
                 CreateElement("UICorner", {
@@ -1770,7 +1808,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BorderSizePixel = 0,
                     AutoButtonColor = false,
-                    ZIndex = 101
+                    ZIndex = 501
                 })
                 
                 CreateElement("UICorner", {
@@ -1801,7 +1839,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BorderSizePixel = 1,
                     BorderColor3 = Color3.fromRGB(0, 0, 0),
-                    ZIndex = 105
+                    ZIndex = 505
                 })
                 
                 -- RGB Display
@@ -1815,7 +1853,7 @@ function Library:CreateWindow(config)
                     TextColor3 = Theme.Text,
                     TextSize = 11,
                     Font = Enum.Font.Gotham,
-                    ZIndex = 101
+                    ZIndex = 501
                 })
                 
                 local function UpdateColor()
@@ -1863,14 +1901,49 @@ function Library:CreateWindow(config)
                     end
                 end)
                 
+                local function UpdatePickerPosition()
+                    local pickerPos = ColorPicker.AbsolutePosition
+                    local pickerSize = ColorPicker.AbsoluteSize
+                    PickerWindow.Position = UDim2.new(0, pickerPos.X, 0, pickerPos.Y + pickerSize.Y + 5)
+                    PickerWindow.Size = UDim2.new(0, pickerSize.X, 0, 0)
+                end
+                
                 ColorButton.MouseButton1Click:Connect(function()
                     pickerOpen = not pickerOpen
                     PickerWindow.Visible = pickerOpen
                     
                     if pickerOpen then
-                        Tween(PickerWindow, {Size = UDim2.new(1, 0, 0, 145)}, 0.2)
+                        UpdatePickerPosition()
+                        Tween(PickerWindow, {Size = UDim2.new(0, ColorPicker.AbsoluteSize.X, 0, 145)}, 0.2)
                     else
-                        Tween(PickerWindow, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        Tween(PickerWindow, {Size = UDim2.new(0, ColorPicker.AbsoluteSize.X, 0, 0)}, 0.2)
+                        task.wait(0.2)
+                        PickerWindow.Visible = false
+                    end
+                end)
+                
+                -- Close color picker when clicking outside
+                UserInputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        if pickerOpen and PickerWindow.Visible then
+                            local mousePos = input.Position
+                            local windowPos = PickerWindow.AbsolutePosition
+                            local windowSize = PickerWindow.AbsoluteSize
+                            local pickerPos = ColorPicker.AbsolutePosition
+                            local pickerSize = ColorPicker.AbsoluteSize
+                            
+                            local inPicker = mousePos.X >= pickerPos.X and mousePos.X <= pickerPos.X + pickerSize.X and
+                                           mousePos.Y >= pickerPos.Y and mousePos.Y <= pickerPos.Y + pickerSize.Y
+                            local inWindow = mousePos.X >= windowPos.X and mousePos.X <= windowPos.X + windowSize.X and
+                                           mousePos.Y >= windowPos.Y and mousePos.Y <= windowPos.Y + windowSize.Y
+                            
+                            if not inPicker and not inWindow then
+                                pickerOpen = false
+                                Tween(PickerWindow, {Size = UDim2.new(0, ColorPicker.AbsoluteSize.X, 0, 0)}, 0.2)
+                                task.wait(0.2)
+                                PickerWindow.Visible = false
+                            end
+                        end
                     end
                 end)
                 
