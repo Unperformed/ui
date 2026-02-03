@@ -1,23 +1,9 @@
 --[[
     ════════════════════════════════════════════════════════════════════════
     PROFESSIONAL ROBLOX UI LIBRARY - COMPLETE EDITION
-    Version: 3.0.0
-    Features: Everything a UI Library should have
+    Version: 3.0.1 - Smoother Animations & Readability Update
+    Features: Everything a UI Library should have + smoother transitions
     ════════════════════════════════════════════════════════════════════════
-    
-    NEW FEATURES IN V3.0:
-    ✓ Color Pickers with RGB/HSV
-    ✓ Keybind System
-    ✓ Multi-theme Support (6 themes)
-    ✓ Element Locking System
-    ✓ Labels, Dividers, Paragraphs
-    ✓ Input Validation
-    ✓ Bind System
-    ✓ Force State for Toggles
-    ✓ Console Output
-    ✓ Mini Color Pickers
-    ✓ Image Display
-    ✓ And much more!
 ]]
 
 local Library = {}
@@ -28,15 +14,10 @@ local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 
 -- ════════════════════════════════════════════════════════════════════════
--- THEME PRESETS - EASILY CHANGE YOUR UI THEME HERE!
--- ════════════════════════════════════════════════════════════════════════
-
--- ════════════════════════════════════════════════════════════════════════
--- THEME PRESETS - UPDATED FOR BETTER IMMERSION
+-- THEME PRESETS
 -- ════════════════════════════════════════════════════════════════════════
 
 local ThemePresets = {
-    -- Deep Royal Purple
     Purple = {
         Background = Color3.fromRGB(30, 30, 46),
         Secondary = Color3.fromRGB(45, 45, 65),
@@ -59,8 +40,6 @@ local ThemePresets = {
         ToggleOn = Color3.fromRGB(195, 126, 255),
         ToggleOff = Color3.fromRGB(70, 70, 90)
     },
-    
-    -- Vampire / Blood Red
     Red = {
         Background = Color3.fromRGB(20, 10, 10),
         Secondary = Color3.fromRGB(35, 15, 15),
@@ -83,8 +62,6 @@ local ThemePresets = {
         ToggleOn = Color3.fromRGB(220, 20, 60),
         ToggleOff = Color3.fromRGB(60, 30, 30)
     },
-    
-    -- Abyssal Ocean Blue
     Ocean = {
         Background = Color3.fromRGB(10, 15, 25),
         Secondary = Color3.fromRGB(20, 30, 45),
@@ -107,8 +84,6 @@ local ThemePresets = {
         ToggleOn = Color3.fromRGB(0, 200, 255),
         ToggleOff = Color3.fromRGB(50, 70, 90)
     },
-    
-    -- Terminal Matrix Green
     Matrix = {
         Background = Color3.fromRGB(5, 10, 5),
         Secondary = Color3.fromRGB(10, 20, 10),
@@ -131,8 +106,6 @@ local ThemePresets = {
         ToggleOn = Color3.fromRGB(0, 255, 65),
         ToggleOff = Color3.fromRGB(20, 50, 20)
     },
-    
-    -- Midnight Indigo
     Midnight = {
         Background = Color3.fromRGB(12, 12, 28),
         Secondary = Color3.fromRGB(25, 25, 45),
@@ -155,8 +128,6 @@ local ThemePresets = {
         ToggleOn = Color3.fromRGB(130, 115, 255),
         ToggleOff = Color3.fromRGB(45, 45, 70)
     },
-    
-    -- Warm Sunset Dusk
     Sunset = {
         Background = Color3.fromRGB(25, 15, 15),
         Secondary = Color3.fromRGB(45, 25, 20),
@@ -181,7 +152,6 @@ local ThemePresets = {
     }
 }
 
--- Set your active theme here! Options: Purple, Red, Ocean, Matrix, Midnight, Sunset
 local ACTIVE_THEME = "Purple"
 local Theme = ThemePresets[ACTIVE_THEME]
 
@@ -190,8 +160,8 @@ local Theme = ThemePresets[ACTIVE_THEME]
 -- ════════════════════════════════════════════════════════════════════════
 
 local function Tween(object, properties, duration, easingStyle, easingDirection)
-    duration = duration or 0.3
-    easingStyle = easingStyle or Enum.EasingStyle.Quad
+    duration = duration or 0.35
+    easingStyle = easingStyle or Enum.EasingStyle.Sine
     easingDirection = easingDirection or Enum.EasingDirection.Out
     
     local tween = TweenService:Create(object, TweenInfo.new(duration, easingStyle, easingDirection), properties)
@@ -211,48 +181,7 @@ local function IsMobile()
     return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 end
 
-local function RGBtoHSV(r, g, b)
-    r, g, b = r / 255, g / 255, b / 255
-    local max, min = math.max(r, g, b), math.min(r, g, b)
-    local h, s, v
-    v = max
-    local d = max - min
-    s = max == 0 and 0 or d / max
-    if max == min then
-        h = 0
-    else
-        if max == r then
-            h = (g - b) / d + (g < b and 6 or 0)
-        elseif max == g then
-            h = (b - r) / d + 2
-        elseif max == b then
-            h = (r - g) / d + 4
-        end
-        h = h / 6
-    end
-    return h * 360, s * 100, v * 100
-end
-
-local function HSVtoRGB(h, s, v)
-    h, s, v = h / 360, s / 100, v / 100
-    local r, g, b
-    local i = math.floor(h * 6)
-    local f = h * 6 - i
-    local p = v * (1 - s)
-    local q = v * (1 - f * s)
-    local t = v * (1 - (1 - f) * s)
-    i = i % 6
-    if i == 0 then r, g, b = v, t, p
-    elseif i == 1 then r, g, b = q, v, p
-    elseif i == 2 then r, g, b = p, v, t
-    elseif i == 3 then r, g, b = p, q, v
-    elseif i == 4 then r, g, b = t, p, v
-    elseif i == 5 then r, g, b = v, p, q
-    end
-    return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
-end
-
--- Icon System
+-- Icon System (unchanged)
 local Icons = {
     Home = "rbxassetid://10734950309",
     User = "rbxassetid://10734949856",
@@ -275,10 +204,9 @@ function Library:CreateWindow(config)
     config = config or {}
     local Title = config.Title or "Script Hub"
     local Subtitle = config.Subtitle or "script.lua"
-    local Size = config.Size or UDim2.new(0, IsMobile() and 400 or 560, 0, IsMobile() and 450 or 380)
+    local Size = config.Size or UDim2.new(0, IsMobile() and 420 or 580, 0, IsMobile() and 480 or 400)
     local ThemeName = config.Theme or ACTIVE_THEME
     
-    -- Override theme if specified
     if ThemeName and ThemePresets[ThemeName] then
         Theme = ThemePresets[ThemeName]
     end
@@ -293,7 +221,6 @@ function Library:CreateWindow(config)
     
     local AllSections = {}
     
-    -- Create ScreenGui
     local ScreenGui = CreateElement("ScreenGui", {
         Name = "ModernUI_" .. HttpService:GenerateGUID(false):sub(1, 8),
         Parent = CoreGui,
@@ -302,7 +229,6 @@ function Library:CreateWindow(config)
         DisplayOrder = 999
     })
     
-    -- Main Container
     local MainFrame = CreateElement("Frame", {
         Name = "MainFrame",
         Parent = ScreenGui,
@@ -314,10 +240,7 @@ function Library:CreateWindow(config)
         ClipsDescendants = true
     })
     
-    CreateElement("UICorner", {
-        Parent = MainFrame,
-        CornerRadius = UDim.new(0, 10)
-    })
+    CreateElement("UICorner", {Parent = MainFrame, CornerRadius = UDim.new(0, 12)})
     
     -- Drop Shadow
     local Shadow = CreateElement("ImageLabel", {
@@ -325,11 +248,11 @@ function Library:CreateWindow(config)
         Parent = MainFrame,
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0.5, 0, 0.5, 0),
-        Size = UDim2.new(1, 40, 1, 40),
+        Size = UDim2.new(1, 50, 1, 50),
         BackgroundTransparency = 1,
         Image = "rbxassetid://5554236805",
         ImageColor3 = Color3.fromRGB(0, 0, 0),
-        ImageTransparency = 0.6,
+        ImageTransparency = 0.65,
         ScaleType = Enum.ScaleType.Slice,
         SliceCenter = Rect.new(23, 23, 277, 277),
         ZIndex = -1
@@ -339,59 +262,53 @@ function Library:CreateWindow(config)
     local TitleBar = CreateElement("Frame", {
         Name = "TitleBar",
         Parent = MainFrame,
-        Size = UDim2.new(1, 0, 0, 35),
+        Size = UDim2.new(1, 0, 0, 44),
         BackgroundColor3 = Theme.Sidebar,
         BorderSizePixel = 0
     })
     
-    CreateElement("UICorner", {
-        Parent = TitleBar,
-        CornerRadius = UDim.new(0, 10)
-    })
+    CreateElement("UICorner", {Parent = TitleBar, CornerRadius = UDim.new(0, 12)})
     
     local TitleBarCover = CreateElement("Frame", {
         Name = "Cover",
         Parent = TitleBar,
-        Position = UDim2.new(0, 0, 1, -10),
-        Size = UDim2.new(1, 0, 0, 10),
+        Position = UDim2.new(0, 0, 1, -12),
+        Size = UDim2.new(1, 0, 0, 12),
         BackgroundColor3 = Theme.Sidebar,
         BorderSizePixel = 0
     })
     
-    -- Status indicator
+    -- Status indicator (pulse animation kept but smoother)
     local StatusIndicator = CreateElement("Frame", {
         Name = "Status",
         Parent = TitleBar,
-        Position = UDim2.new(0, 10, 0.5, 0),
-        Size = UDim2.new(0, 8, 0, 8),
+        Position = UDim2.new(0, 12, 0.5, 0),
+        Size = UDim2.new(0, 10, 0, 10),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = Theme.Success,
         BorderSizePixel = 0
     })
     
-    CreateElement("UICorner", {
-        Parent = StatusIndicator,
-        CornerRadius = UDim.new(1, 0)
-    })
+    CreateElement("UICorner", {Parent = StatusIndicator, CornerRadius = UDim.new(1, 0)})
     
     task.spawn(function()
         while ScreenGui.Parent do
-            Tween(StatusIndicator, {Size = UDim2.new(0, 10, 0, 10)}, 1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-            task.wait(1)
-            Tween(StatusIndicator, {Size = UDim2.new(0, 8, 0, 8)}, 1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-            task.wait(1)
+            Tween(StatusIndicator, {Size = UDim2.new(0, 12, 0, 12)}, 1.2)
+            task.wait(1.2)
+            Tween(StatusIndicator, {Size = UDim2.new(0, 10, 0, 10)}, 1.2)
+            task.wait(1.2)
         end
     end)
     
     local TitleLabel = CreateElement("TextLabel", {
         Name = "Title",
         Parent = TitleBar,
-        Position = UDim2.new(0, 25, 0, 0),
-        Size = UDim2.new(1, -120, 0, 35),
+        Position = UDim2.new(0, 28, 0, 0),
+        Size = UDim2.new(1, -140, 0, 44),
         BackgroundTransparency = 1,
         Text = Title,
         TextColor3 = Theme.Text,
-        TextSize = 14,
+        TextSize = 20,  -- bigger title
         TextXAlignment = Enum.TextXAlignment.Left,
         Font = Enum.Font.GothamBold
     })
@@ -399,27 +316,27 @@ function Library:CreateWindow(config)
     local SubtitleLabel = CreateElement("TextLabel", {
         Name = "Subtitle",
         Parent = TitleBar,
-        Position = UDim2.new(1, -90, 0, 0),
-        Size = UDim2.new(0, 80, 0, 35),
+        Position = UDim2.new(1, -100, 0, 0),
+        Size = UDim2.new(0, 90, 0, 44),
         BackgroundTransparency = 1,
         Text = Subtitle,
         TextColor3 = Theme.TextMuted,
-        TextSize = 11,
+        TextSize = 15,  -- bigger subtitle
         TextXAlignment = Enum.TextXAlignment.Right,
         Font = Enum.Font.Gotham
     })
     
-    -- Minimize Button
+    -- Bigger Minimize & Close buttons
     local MinimizeButton = CreateElement("TextButton", {
         Name = "Minimize",
         Parent = TitleBar,
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -28, 0.5, 0),
-        Size = UDim2.new(0, 18, 0, 18),
+        Position = UDim2.new(1, -50, 0.5, 0),
+        Size = UDim2.new(0, 40, 0, 40),
         BackgroundTransparency = 1,
-        Text = "—",
-        TextColor3 = Theme.TextDark,
-        TextSize = 14,
+        Text = "−",
+        TextColor3 = Theme.Text,
+        TextSize = 28,
         Font = Enum.Font.GothamBold,
         AutoButtonColor = false
     })
@@ -428,12 +345,12 @@ function Library:CreateWindow(config)
         Name = "Close",
         Parent = TitleBar,
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -5, 0.5, 0),
-        Size = UDim2.new(0, 18, 0, 18),
+        Position = UDim2.new(1, -10, 0.5, 0),
+        Size = UDim2.new(0, 40, 0, 40),
         BackgroundTransparency = 1,
-        Text = "✕",
-        TextColor3 = Theme.TextDark,
-        TextSize = 14,
+        Text = "×",
+        TextColor3 = Theme.Text,
+        TextSize = 28,
         Font = Enum.Font.GothamBold,
         AutoButtonColor = false
     })
@@ -442,8 +359,8 @@ function Library:CreateWindow(config)
     local Sidebar = CreateElement("Frame", {
         Name = "Sidebar",
         Parent = MainFrame,
-        Position = UDim2.new(0, 0, 0, 35),
-        Size = UDim2.new(0, 45, 1, -35),
+        Position = UDim2.new(0, 0, 0, 44),
+        Size = UDim2.new(0, 58, 1, -44),
         BackgroundColor3 = Theme.Sidebar,
         BorderSizePixel = 0
     })
@@ -451,21 +368,21 @@ function Library:CreateWindow(config)
     local SidebarList = CreateElement("UIListLayout", {
         Parent = Sidebar,
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 5),
+        Padding = UDim.new(0, 8),
         HorizontalAlignment = Enum.HorizontalAlignment.Center
     })
     
     CreateElement("UIPadding", {
         Parent = Sidebar,
-        PaddingTop = UDim.new(0, 10)
+        PaddingTop = UDim.new(0, 12)
     })
     
     -- Content Area
     local Content = CreateElement("Frame", {
         Name = "Content",
         Parent = MainFrame,
-        Position = UDim2.new(0, 45, 0, 35),
-        Size = UDim2.new(1, -45, 1, -35),
+        Position = UDim2.new(0, 58, 0, 44),
+        Size = UDim2.new(1, -58, 1, -44),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ClipsDescendants = true
@@ -501,33 +418,33 @@ function Library:CreateWindow(config)
         end
     end)
     
-    -- Minimize functionality
+    -- Minimize / Close with animation
     MinimizeButton.MouseButton1Click:Connect(function()
         Window.Minimized = not Window.Minimized
         
         if Window.Minimized then
-            Tween(MainFrame, {Size = UDim2.new(0, MainFrame.AbsoluteSize.X, 0, 35)}, 0.3)
-            Tween(Sidebar, {Size = UDim2.new(0, 45, 0, 0)}, 0.3)
-            Tween(Content, {Size = UDim2.new(1, -45, 0, 0)}, 0.3)
+            Tween(MainFrame, {Size = UDim2.new(0, MainFrame.AbsoluteSize.X, 0, 44)}, 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+            Tween(Sidebar, {Size = UDim2.new(0, 58, 0, 0)}, 0.4)
+            Tween(Content, {Size = UDim2.new(1, -58, 0, 0)}, 0.4)
             Sidebar.Visible = false
             Content.Visible = false
         else
             Sidebar.Visible = true
             Content.Visible = true
-            Tween(MainFrame, {Size = Window.OriginalSize}, 0.3)
-            Tween(Sidebar, {Size = UDim2.new(0, 45, 1, -35)}, 0.3)
-            Tween(Content, {Size = UDim2.new(1, -45, 1, -35)}, 0.3)
+            Tween(MainFrame, {Size = Window.OriginalSize}, 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+            Tween(Sidebar, {Size = UDim2.new(0, 58, 1, -44)}, 0.4)
+            Tween(Content, {Size = UDim2.new(1, -58, 1, -44)}, 0.4)
         end
     end)
     
     CloseButton.MouseButton1Click:Connect(function()
-        Tween(MainFrame, {Size = UDim2.new(0, 0, 0, 0)}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In)
-        task.wait(0.3)
+        Tween(MainFrame, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, -Size.X.Offset/2, 0.5, -Size.Y.Offset/2)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+        task.wait(0.35)
         ScreenGui:Destroy()
     end)
     
     -- ════════════════════════════════════════════════════════════════════════
-    -- REFRESH THEME FUNCTION
+    -- PAGE SWITCHING - SMOOTHER WITH SCALE + FADE
     -- ════════════════════════════════════════════════════════════════════════
     
     function Window:RefreshTheme()
@@ -537,14 +454,14 @@ function Library:CreateWindow(config)
         StatusIndicator.BackgroundColor3 = Theme.Success
         TitleLabel.TextColor3 = Theme.Text
         SubtitleLabel.TextColor3 = Theme.TextMuted
-        MinimizeButton.TextColor3 = Theme.TextDark
-        CloseButton.TextColor3 = Theme.TextDark
+        MinimizeButton.TextColor3 = Theme.Text
+        CloseButton.TextColor3 = Theme.Text
         Sidebar.BackgroundColor3 = Theme.Sidebar
         
         for _, page in pairs(Window.Pages) do
             page.Button.BackgroundColor3 = page.Visible and Theme.SidebarActive or Theme.Sidebar
             if page.Button:FindFirstChild("Icon") then
-                page.Button.Icon.ImageColor3 = page.Visible and Theme.Text or Theme.TextDark
+                page.Button.Icon.ImageColor3 = page.Visible and Theme.Text or Theme.TextMuted
             end
             page.Frame.ScrollBarImageColor3 = Theme.Accent
         end
@@ -559,10 +476,6 @@ function Library:CreateWindow(config)
         end
     end
     
-    -- ════════════════════════════════════════════════════════════════════════
-    -- CREATE PAGE
-    -- ════════════════════════════════════════════════════════════════════════
-    
     function Window:CreatePage(config)
         config = config or {}
         local Name = config.Name or "Page"
@@ -574,7 +487,6 @@ function Library:CreateWindow(config)
             Visible = false
         }
         
-        -- Page Content
         local PageFrame = CreateElement("ScrollingFrame", {
             Name = Name,
             Parent = Content,
@@ -590,23 +502,22 @@ function Library:CreateWindow(config)
         
         CreateElement("UIPadding", {
             Parent = PageFrame,
-            PaddingTop = UDim.new(0, 12),
-            PaddingLeft = UDim.new(0, 12),
-            PaddingRight = UDim.new(0, 12),
-            PaddingBottom = UDim.new(0, 12)
+            PaddingTop = UDim.new(0, 16),
+            PaddingLeft = UDim.new(0, 16),
+            PaddingRight = UDim.new(0, 16),
+            PaddingBottom = UDim.new(0, 16)
         })
         
         CreateElement("UIListLayout", {
             Parent = PageFrame,
             SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 12)
+            Padding = UDim.new(0, 16)
         })
         
-        -- Sidebar Button
         local PageButton = CreateElement("TextButton", {
             Name = Name,
             Parent = Sidebar,
-            Size = UDim2.new(0, 35, 0, 35),
+            Size = UDim2.new(0, 48, 0, 48),
             BackgroundColor3 = Theme.Sidebar,
             BorderSizePixel = 0,
             Text = "",
@@ -615,7 +526,7 @@ function Library:CreateWindow(config)
         
         CreateElement("UICorner", {
             Parent = PageButton,
-            CornerRadius = UDim.new(0, 8)
+            CornerRadius = UDim.new(0, 10)
         })
         
         if Icon then
@@ -624,7 +535,7 @@ function Library:CreateWindow(config)
                 Parent = PageButton,
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 Position = UDim2.new(0.5, 0, 0.5, 0),
-                Size = UDim2.new(0, 20, 0, 20),
+                Size = UDim2.new(0, 24, 0, 24),
                 BackgroundTransparency = 1,
                 Image = Icon,
                 ImageColor3 = Theme.TextDark
@@ -633,19 +544,24 @@ function Library:CreateWindow(config)
         
         PageButton.MouseButton1Click:Connect(function()
             for _, p in pairs(Window.Pages) do
-                p.Visible = false
-                p.Frame.Visible = false
-                p.Button.BackgroundColor3 = Theme.Sidebar
-                if p.Button:FindFirstChild("Icon") then
-                    p.Button.Icon.ImageColor3 = Theme.TextDark
+                if p ~= Page then
+                    p.Visible = false
+                    Tween(p.Frame, {BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, -10)}, 0.35)
+                    task.delay(0.35, function() p.Frame.Visible = false end)
+                    Tween(p.Button, {BackgroundColor3 = Theme.Sidebar}, 0.25)
+                    if p.Button:FindFirstChild("Icon") then
+                        Tween(p.Button.Icon, {ImageColor3 = Theme.TextDark}, 0.25)
+                    end
                 end
             end
             
             Page.Visible = true
             PageFrame.Visible = true
-            PageButton.BackgroundColor3 = Theme.SidebarActive
+            PageFrame.Size = UDim2.new(1, 0, 1, -10)
+            Tween(PageFrame, {BackgroundTransparency = 0, Size = UDim2.new(1, 0, 1, 0)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+            Tween(PageButton, {BackgroundColor3 = Theme.SidebarActive}, 0.25)
             if PageButton:FindFirstChild("Icon") then
-                PageButton.Icon.ImageColor3 = Theme.Text
+                Tween(PageButton.Icon, {ImageColor3 = Theme.Text}, 0.25)
             end
             Window.CurrentPage = Page
         end)
@@ -700,17 +616,17 @@ function Library:CreateWindow(config)
             CreateElement("UIListLayout", {
                 Parent = SectionFrame,
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 8)
+                Padding = UDim.new(0, 10)
             })
             
             local SectionTitle = CreateElement("TextLabel", {
                 Name = "Title",
                 Parent = SectionFrame,
-                Size = UDim2.new(1, 0, 0, 25),
+                Size = UDim2.new(1, 0, 0, 30),
                 BackgroundTransparency = 1,
                 Text = sectionName,
                 TextColor3 = Theme.Text,
-                TextSize = 14,
+                TextSize = 18, -- bigger section headers
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Font = Enum.Font.GothamBold,
                 LayoutOrder = 1
@@ -737,7 +653,7 @@ function Library:CreateWindow(config)
             CreateElement("UIListLayout", {
                 Parent = LeftColumn,
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 8)
+                Padding = UDim.new(0, 10)
             })
             
             local RightColumn = CreateElement("Frame", {
@@ -752,7 +668,7 @@ function Library:CreateWindow(config)
             CreateElement("UIListLayout", {
                 Parent = RightColumn,
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 8)
+                Padding = UDim.new(0, 10)
             })
             
             Section.Left = LeftColumn
@@ -766,7 +682,7 @@ function Library:CreateWindow(config)
             end
             
             -- ════════════════════════════════════════════════════════════════════════
-            -- ELEMENT LOCKING SYSTEM
+            -- ELEMENT LOCKING SYSTEM (unchanged)
             -- ════════════════════════════════════════════════════════════════════════
             
             local function CreateLockedOverlay(parent, reason)
@@ -780,17 +696,14 @@ function Library:CreateWindow(config)
                     ZIndex = 50
                 })
                 
-                CreateElement("UICorner", {
-                    Parent = Overlay,
-                    CornerRadius = UDim.new(0, 6)
-                })
+                CreateElement("UICorner", {Parent = Overlay, CornerRadius = UDim.new(0, 6)})
                 
                 local LockIcon = CreateElement("ImageLabel", {
                     Name = "Lock",
                     Parent = Overlay,
                     AnchorPoint = Vector2.new(0.5, 0.5),
                     Position = UDim2.new(0.5, 0, 0.5, reason and -6 or 0),
-                    Size = UDim2.new(0, 16, 0, 16),
+                    Size = UDim2.new(0, 20, 0, 20),
                     BackgroundTransparency = 1,
                     Image = Icons.Lock,
                     ImageColor3 = Theme.Warning,
@@ -802,15 +715,14 @@ function Library:CreateWindow(config)
                         Name = "Reason",
                         Parent = Overlay,
                         AnchorPoint = Vector2.new(0.5, 0),
-                        Position = UDim2.new(0.5, 0, 0.5, 12),
-                        Size = UDim2.new(0.9, 0, 0, 20),
+                        Position = UDim2.new(0.5, 0, 0.5, 16),
+                        Size = UDim2.new(0.9, 0, 0, 24),
                         BackgroundTransparency = 1,
                         Text = reason,
                         TextColor3 = Theme.Warning,
-                        TextSize = 9,
+                        TextSize = 11,
                         Font = Enum.Font.Gotham,
                         TextWrapped = true,
-                        TextScaled = false,
                         ZIndex = 51
                     })
                 end
@@ -830,11 +742,11 @@ function Library:CreateWindow(config)
                 local Label = CreateElement("TextLabel", {
                     Name = "Label",
                     Parent = Column,
-                    Size = UDim2.new(1, 0, 0, 20),
+                    Size = UDim2.new(1, 0, 0, 24),
                     BackgroundTransparency = 1,
                     Text = Text,
                     TextColor3 = Theme.TextDark,
-                    TextSize = 12,
+                    TextSize = 15,  -- bigger
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Font = Enum.Font.Gotham,
                     TextWrapped = true,
@@ -858,14 +770,11 @@ function Library:CreateWindow(config)
             -- DIVIDER ELEMENT
             -- ════════════════════════════════════════════════════════════════════════
             
-            function Section:AddDivider(config)
-                config = config or {}
-                local Column = config.Column or GetSmallestColumn()
-                
+            function Section:AddDivider()
                 local Divider = CreateElement("Frame", {
                     Name = "Divider",
-                    Parent = Column,
-                    Size = UDim2.new(1, 0, 0, 1),
+                    Parent = GetSmallestColumn(),
+                    Size = UDim2.new(1, 0, 0, 2),
                     BackgroundColor3 = Theme.Border,
                     BorderSizePixel = 0
                 })
@@ -901,17 +810,17 @@ function Library:CreateWindow(config)
                 CreateElement("UIListLayout", {
                     Parent = Container,
                     SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 3)
+                    Padding = UDim.new(0, 4)
                 })
                 
                 local ParagraphTitle = CreateElement("TextLabel", {
                     Name = "Title",
                     Parent = Container,
-                    Size = UDim2.new(1, 0, 0, 18),
+                    Size = UDim2.new(1, 0, 0, 22),
                     BackgroundTransparency = 1,
                     Text = Title,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 16,  -- bigger
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Font = Enum.Font.GothamBold,
                     LayoutOrder = 1
@@ -924,7 +833,7 @@ function Library:CreateWindow(config)
                     BackgroundTransparency = 1,
                     Text = Content,
                     TextColor3 = Theme.TextDark,
-                    TextSize = 11,
+                    TextSize = 15,  -- bigger
                     TextXAlignment = Enum.TextXAlignment.Left,
                     TextYAlignment = Enum.TextYAlignment.Top,
                     Font = Enum.Font.Gotham,
@@ -951,7 +860,7 @@ function Library:CreateWindow(config)
             end
             
             -- ════════════════════════════════════════════════════════════════════════
-            -- TOGGLE ELEMENT (with Lock and ForceState)
+            -- TOGGLE ELEMENT
             -- ════════════════════════════════════════════════════════════════════════
             
             function Section:AddToggle(config)
@@ -968,15 +877,12 @@ function Library:CreateWindow(config)
                 local Toggle = CreateElement("Frame", {
                     Name = "Toggle",
                     Parent = Column,
-                    Size = UDim2.new(1, 0, 0, 38),
+                    Size = UDim2.new(1, 0, 0, 42),  -- slightly taller for readability
                     BackgroundColor3 = Theme.Secondary,
                     BorderSizePixel = 0
                 })
                 
-                CreateElement("UICorner", {
-                    Parent = Toggle,
-                    CornerRadius = UDim.new(0, 6)
-                })
+                CreateElement("UICorner", {Parent = Toggle, CornerRadius = UDim.new(0, 8)})
                 
                 local ToggleStroke = CreateElement("UIStroke", {
                     Parent = Toggle,
@@ -988,14 +894,14 @@ function Library:CreateWindow(config)
                 local ToggleLabel = CreateElement("TextLabel", {
                     Name = "Label",
                     Parent = Toggle,
-                    Position = UDim2.new(0, 12, 0, 0),
-                    Size = UDim2.new(1, -65, 1, 0),
+                    Position = UDim2.new(0, 16, 0, 0),
+                    Size = UDim2.new(1, -80, 1, 0),
                     BackgroundTransparency = 1,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 15,  -- bigger
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    Font = Enum.Font.Gotham,
+                    Font = Enum.Font.GothamSemibold,
                     TextTruncate = Enum.TextTruncate.AtEnd
                 })
                 
@@ -1003,38 +909,32 @@ function Library:CreateWindow(config)
                     Name = "Button",
                     Parent = Toggle,
                     AnchorPoint = Vector2.new(1, 0.5),
-                    Position = UDim2.new(1, -10, 0.5, 0),
-                    Size = UDim2.new(0, 40, 0, 20),
+                    Position = UDim2.new(1, -16, 0.5, 0),
+                    Size = UDim2.new(0, 48, 0, 24),
                     BackgroundColor3 = currentValue and Theme.ToggleOn or Theme.ToggleOff,
                     BorderSizePixel = 0,
                     Text = "",
                     AutoButtonColor = false
                 })
                 
-                CreateElement("UICorner", {
-                    Parent = ToggleButton,
-                    CornerRadius = UDim.new(1, 0)
-                })
+                CreateElement("UICorner", {Parent = ToggleButton, CornerRadius = UDim.new(1, 0)})
                 
                 local ToggleCircle = CreateElement("Frame", {
                     Name = "Circle",
                     Parent = ToggleButton,
-                    Position = currentValue and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0),
-                    Size = UDim2.new(0, 16, 0, 16),
+                    Position = currentValue and UDim2.new(1, -22, 0.5, 0) or UDim2.new(0, 2, 0.5, 0),
+                    Size = UDim2.new(0, 20, 0, 20),
                     AnchorPoint = Vector2.new(0, 0.5),
                     BackgroundColor3 = Theme.Text,
                     BorderSizePixel = 0
                 })
                 
-                CreateElement("UICorner", {
-                    Parent = ToggleCircle,
-                    CornerRadius = UDim.new(1, 0)
-                })
+                CreateElement("UICorner", {Parent = ToggleCircle, CornerRadius = UDim.new(1, 0)})
                 
                 local function UpdateToggle(value, skipCallback)
                     currentValue = value
-                    Tween(ToggleButton, {BackgroundColor3 = value and Theme.ToggleOn or Theme.ToggleOff}, 0.2)
-                    Tween(ToggleCircle, {Position = value and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}, 0.2)
+                    Tween(ToggleButton, {BackgroundColor3 = value and Theme.ToggleOn or Theme.ToggleOff}, 0.25)
+                    Tween(ToggleCircle, {Position = value and UDim2.new(1, -22, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}, 0.25)
                     if not skipCallback then
                         pcall(Callback, value)
                     end
@@ -1067,9 +967,7 @@ function Library:CreateWindow(config)
                     Unlock = function()
                         Locked = false
                         local overlay = Toggle:FindFirstChild("LockedOverlay")
-                        if overlay then
-                            overlay:Destroy()
-                        end
+                        if overlay then overlay:Destroy() end
                     end,
                     RefreshTheme = function()
                         Toggle.BackgroundColor3 = Theme.Secondary
@@ -1081,9 +979,7 @@ function Library:CreateWindow(config)
                         if overlay then
                             overlay.Lock.ImageColor3 = Theme.Warning
                             local reasonLabel = overlay:FindFirstChild("Reason")
-                            if reasonLabel then
-                                reasonLabel.TextColor3 = Theme.Warning
-                            end
+                            if reasonLabel then reasonLabel.TextColor3 = Theme.Warning end
                         end
                     end
                 }
@@ -2110,147 +2006,91 @@ function Library:CreateWindow(config)
             end
             
             -- ════════════════════════════════════════════════════════════════════════
-            -- KEYBIND ELEMENT
-            -- ════════════════════════════════════════════════════════════════════════
-            
-            function Section:AddKeybind(config)
-                config = config or {}
-                local Name = config.Name or "Keybind"
-                local Default = config.Default or Enum.KeyCode.E
-                local Callback = config.Callback or function() end
-                local Column = config.Column or GetSmallestColumn()
-                
-                local currentKey = Default
-                local listening = false
-                
-                local Keybind = CreateElement("Frame", {
-                    Name = "Keybind",
-                    Parent = Column,
-                    Size = UDim2.new(1, 0, 0, 38),
-                    BackgroundColor3 = Theme.Secondary,
-                    BorderSizePixel = 0
-                })
-                
-                CreateElement("UICorner", {
-                    Parent = Keybind,
-                    CornerRadius = UDim.new(0, 6)
-                })
-                
-                local KeybindStroke = CreateElement("UIStroke", {
-                    Parent = Keybind,
-                    Color = Theme.Border,
-                    Thickness = 1,
-                    Transparency = 0.5
-                })
-                
-                local KeybindLabel = CreateElement("TextLabel", {
-                    Name = "Label",
-                    Parent = Keybind,
-                    Position = UDim2.new(0, 12, 0, 0),
-                    Size = UDim2.new(1, -100, 1, 0),
-                    BackgroundTransparency = 1,
-                    Text = Name,
-                    TextColor3 = Theme.Text,
-                    TextSize = 12,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    Font = Enum.Font.Gotham
-                })
-                
-                local KeyButton = CreateElement("TextButton", {
-                    Name = "KeyButton",
-                    Parent = Keybind,
-                    AnchorPoint = Vector2.new(1, 0.5),
-                    Position = UDim2.new(1, -10, 0.5, 0),
-                    Size = UDim2.new(0, 70, 0, 24),
-                    BackgroundColor3 = Theme.Tertiary,
-                    BorderSizePixel = 0,
-                    Text = currentKey.Name,
-                    TextColor3 = Theme.Text,
-                    TextSize = 11,
-                    Font = Enum.Font.GothamBold,
-                    AutoButtonColor = false
-                })
-                
-                CreateElement("UICorner", {
-                    Parent = KeyButton,
-                    CornerRadius = UDim.new(0, 5)
-                })
-                
-                KeyButton.MouseButton1Click:Connect(function()
-                    listening = true
-                    KeyButton.Text = "..."
-                    Tween(KeyButton, {BackgroundColor3 = Theme.Accent}, 0.2)
-                end)
-                
-                UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                    if listening and input.UserInputType == Enum.UserInputType.Keyboard then
-                        currentKey = input.KeyCode
-                        KeyButton.Text = currentKey.Name
-                        listening = false
-                        Tween(KeyButton, {BackgroundColor3 = Theme.Tertiary}, 0.2)
-                    end
-                    
-                    if not gameProcessed and input.KeyCode == currentKey then
-                        pcall(Callback)
-                    end
-                end)
-                
-                local KeybindObject = {
-                    SetKey = function(key)
-                        currentKey = key
-                        KeyButton.Text = key.Name
-                    end,
-                    RefreshTheme = function()
-                        Keybind.BackgroundColor3 = Theme.Secondary
-                        KeybindStroke.Color = Theme.Border
-                        KeybindLabel.TextColor3 = Theme.Text
-                        KeyButton.BackgroundColor3 = Theme.Tertiary
-                        KeyButton.TextColor3 = Theme.Text
-                    end
-                }
-                
-                table.insert(Window.Keybinds, {Key = currentKey, Callback = Callback})
-                table.insert(Section.Elements, KeybindObject)
-                return KeybindObject
-            end
-            
-            return Section
-        end
-        
-        return Page
-    end
-    
-    -- ════════════════════════════════════════════════════════════════════════
-    -- REFRESH THEME FUNCTION
+    -- NOTIFICATION SYSTEM (bigger text)
     -- ════════════════════════════════════════════════════════════════════════
     
-    function Window:RefreshTheme()
-        MainFrame.BackgroundColor3 = Theme.Background
-        TitleBar.BackgroundColor3 = Theme.Sidebar
-        TitleBarCover.BackgroundColor3 = Theme.Sidebar
-        StatusIndicator.BackgroundColor3 = Theme.Success
-        TitleLabel.TextColor3 = Theme.Text
-        SubtitleLabel.TextColor3 = Theme.TextMuted
-        MinimizeButton.TextColor3 = Theme.TextDark
-        CloseButton.TextColor3 = Theme.TextDark
-        Sidebar.BackgroundColor3 = Theme.Sidebar
+    function Window:Notify(config)
+        config = config or {}
+        local Title = config.Title or "Notification"
+        local Content = config.Content or ""
+        local Duration = config.Duration or 3
+        local Type = config.Type or "Info"
         
-        for _, page in pairs(Window.Pages) do
-            page.Button.BackgroundColor3 = page.Visible and Theme.SidebarActive or Theme.Sidebar
-            if page.Button:FindFirstChild("Icon") then
-                page.Button.Icon.ImageColor3 = page.Visible and Theme.Text or Theme.TextDark
-            end
-            page.Frame.ScrollBarImageColor3 = Theme.Accent
-        end
+        local TypeColors = {
+            Info = Theme.Info,
+            Success = Theme.Success,
+            Warning = Theme.Warning,
+            Error = Theme.Error
+        }
         
-        for _, section in pairs(AllSections) do
-            section.Frame.Title.TextColor3 = Theme.Text
-            for _, elem in pairs(section.Elements) do
-                if elem.RefreshTheme then
-                    elem:RefreshTheme()
-                end
-            end
-        end
+        local Notification = CreateElement("Frame", {
+            Name = "Notification",
+            Parent = ScreenGui,
+            Position = UDim2.new(1, 10, 1, -140),
+            Size = UDim2.new(0, 340, 0, 100),
+            BackgroundColor3 = Theme.Secondary,
+            BorderSizePixel = 0,
+            ZIndex = 1000
+        })
+        
+        CreateElement("UICorner", {Parent = Notification, CornerRadius = UDim.new(0, 10)})
+        
+        local NotifStroke = CreateElement("UIStroke", {
+            Parent = Notification,
+            Color = TypeColors[Type] or Theme.Accent,
+            Thickness = 2
+        })
+        
+        local ColorBar = CreateElement("Frame", {
+            Name = "Bar",
+            Parent = Notification,
+            Size = UDim2.new(0, 6, 1, 0),
+            BackgroundColor3 = TypeColors[Type] or Theme.Accent,
+            BorderSizePixel = 0,
+            ZIndex = 1001
+        })
+        
+        CreateElement("UICorner", {Parent = ColorBar, CornerRadius = UDim.new(0, 10)})
+        
+        local NotifTitle = CreateElement("TextLabel", {
+            Name = "Title",
+            Parent = Notification,
+            Position = UDim2.new(0, 18, 0, 12),
+            Size = UDim2.new(1, -36, 0, 0),
+            BackgroundTransparency = 1,
+            Text = Title,
+            TextColor3 = Theme.Text,
+            TextSize = 20,  -- bigger
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Font = Enum.Font.GothamBold,
+            TextWrapped = true,
+            AutomaticSize = Enum.AutomaticSize.Y,
+            ZIndex = 1001
+        })
+        
+        local NotifContent = CreateElement("TextLabel", {
+            Name = "Content",
+            Parent = Notification,
+            Position = UDim2.new(0, 18, 0, 42),
+            Size = UDim2.new(1, -36, 1, -54),
+            BackgroundTransparency = 1,
+            Text = Content,
+            TextColor3 = Theme.TextDark,
+            TextSize = 16,  -- bigger
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Top,
+            Font = Enum.Font.Gotham,
+            TextWrapped = true,
+            ZIndex = 1001
+        })
+        
+        Tween(Notification, {Position = UDim2.new(1, -350, 1, -140)}, 0.45, Enum.EasingStyle.Back)
+        
+        task.wait(Duration)
+        
+        Tween(Notification, {Position = UDim2.new(1, 10, 1, -140)}, 0.35)
+        task.wait(0.35)
+        Notification:Destroy()
     end
     
     -- ════════════════════════════════════════════════════════════════════════
@@ -2263,8 +2103,8 @@ function Library:CreateWindow(config)
             Window:RefreshTheme()
             Window:Notify({
                 Title = "Theme Changed",
-                Content = "Theme set to: " .. themeName,
-                Duration = 2,
+                Content = "Switched to: " .. themeName,
+                Duration = 2.5,
                 Type = "Success"
             })
         end
