@@ -288,7 +288,7 @@ function Library:CreateWindow(config)
         CurrentPage = nil,
         Minimized = false,
         OriginalSize = Size,
-        Keybinds = L
+        Keybinds = {}
     }
     
     local AllSections = {}
