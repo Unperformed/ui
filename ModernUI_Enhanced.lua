@@ -759,6 +759,8 @@ function Library:CreateWindow(config)
             Section.Right = RightColumn
             Section.Frame = SectionFrame
             
+            table.insert(AllSections, Section)
+            
             local function GetSmallestColumn()
                 return LeftColumn.AbsoluteSize.Y <= RightColumn.AbsoluteSize.Y and LeftColumn or RightColumn
             end
@@ -2196,7 +2198,6 @@ function Library:CreateWindow(config)
                         KeyButton.Text = currentKey.Name
                         listening = false
                         Tween(KeyButton, {BackgroundColor3 = Theme.Tertiary}, 0.2)
-
                     end
                     
                     if not gameProcessed and input.KeyCode == currentKey then
@@ -2208,6 +2209,13 @@ function Library:CreateWindow(config)
                     SetKey = function(key)
                         currentKey = key
                         KeyButton.Text = key.Name
+                    end,
+                    RefreshTheme = function()
+                        Keybind.BackgroundColor3 = Theme.Secondary
+                        KeybindStroke.Color = Theme.Border
+                        KeybindLabel.TextColor3 = Theme.Text
+                        KeyButton.BackgroundColor3 = Theme.Tertiary
+                        KeyButton.TextColor3 = Theme.Text
                     end
                 }
                 
@@ -2255,7 +2263,7 @@ function Library:CreateWindow(config)
             CornerRadius = UDim.new(0, 8)
         })
         
-        CreateElement("UIStroke", {
+        local NotifStroke = CreateElement("UIStroke", {
             Parent = Notification,
             Color = TypeColors[Type] or Theme.Accent,
             Thickness = 2
@@ -2321,14 +2329,7 @@ function Library:CreateWindow(config)
     function Window:SetTheme(themeName)
         if ThemePresets[themeName] then
             Theme = ThemePresets[themeName]
-            
-            -- Update existing UI colors
-            MainFrame.BackgroundColor3 = Theme.Background
-            TitleBar.BackgroundColor3 = Theme.Sidebar
-            TitleBarCover.BackgroundColor3 = Theme.Sidebar
-            Sidebar.BackgroundColor3 = Theme.Sidebar
-            StatusIndicator.BackgroundColor3 = Theme.Success
-            
+            Window:RefreshTheme()
             Window:Notify({
                 Title = "Theme Changed",
                 Content = "Theme set to: " .. themeName,
