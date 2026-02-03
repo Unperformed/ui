@@ -661,7 +661,7 @@ function Library:CreateWindow(config)
             CreateElement("UIListLayout", {
                 Parent = SectionFrame,
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 5)
+                Padding = UDim.new(0, 8)
             })
             
             local SectionTitle = CreateElement("TextLabel", {
@@ -735,7 +735,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(0, 0, 0),
                     BackgroundTransparency = 0.7,
                     BorderSizePixel = 0,
-                    ZIndex = 10
+                    ZIndex = 50
                 })
                 
                 CreateElement("UICorner", {
@@ -747,25 +747,29 @@ function Library:CreateWindow(config)
                     Name = "Lock",
                     Parent = Overlay,
                     AnchorPoint = Vector2.new(0.5, 0.5),
-                    Position = UDim2.new(0.5, -15, 0.5, 0),
+                    Position = UDim2.new(0.5, 0, 0.5, reason and -6 or 0),
                     Size = UDim2.new(0, 16, 0, 16),
                     BackgroundTransparency = 1,
                     Image = Icons.Lock,
-                    ImageColor3 = Theme.Warning
+                    ImageColor3 = Theme.Warning,
+                    ZIndex = 51
                 })
                 
                 if reason then
                     local ReasonLabel = CreateElement("TextLabel", {
                         Name = "Reason",
                         Parent = Overlay,
-                        Position = UDim2.new(0, 0, 1, 2),
-                        Size = UDim2.new(1, 0, 0, 15),
+                        AnchorPoint = Vector2.new(0.5, 0),
+                        Position = UDim2.new(0.5, 0, 0.5, 12),
+                        Size = UDim2.new(0.9, 0, 0, 20),
                         BackgroundTransparency = 1,
                         Text = reason,
                         TextColor3 = Theme.Warning,
                         TextSize = 9,
                         Font = Enum.Font.Gotham,
-                        TextWrapped = true
+                        TextWrapped = true,
+                        TextScaled = false,
+                        ZIndex = 51
                     })
                 end
                 
@@ -839,6 +843,12 @@ function Library:CreateWindow(config)
                     AutomaticSize = Enum.AutomaticSize.Y
                 })
                 
+                CreateElement("UIListLayout", {
+                    Parent = Container,
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 3)
+                })
+                
                 local ParagraphTitle = CreateElement("TextLabel", {
                     Name = "Title",
                     Parent = Container,
@@ -848,13 +858,13 @@ function Library:CreateWindow(config)
                     TextColor3 = Theme.Text,
                     TextSize = 13,
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    Font = Enum.Font.GothamBold
+                    Font = Enum.Font.GothamBold,
+                    LayoutOrder = 1
                 })
                 
                 local ParagraphContent = CreateElement("TextLabel", {
                     Name = "Content",
                     Parent = Container,
-                    Position = UDim2.new(0, 0, 0, 20),
                     Size = UDim2.new(1, 0, 0, 0),
                     BackgroundTransparency = 1,
                     Text = Content,
@@ -864,7 +874,8 @@ function Library:CreateWindow(config)
                     TextYAlignment = Enum.TextYAlignment.Top,
                     Font = Enum.Font.Gotham,
                     TextWrapped = true,
-                    AutomaticSize = Enum.AutomaticSize.Y
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    LayoutOrder = 2
                 })
                 
                 return {
@@ -916,13 +927,14 @@ function Library:CreateWindow(config)
                     Name = "Label",
                     Parent = Toggle,
                     Position = UDim2.new(0, 12, 0, 0),
-                    Size = UDim2.new(1, -60, 1, 0),
+                    Size = UDim2.new(1, -65, 1, 0),
                     BackgroundTransparency = 1,
                     Text = Name,
                     TextColor3 = Theme.Text,
                     TextSize = 13,
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    Font = Enum.Font.Gotham
+                    Font = Enum.Font.Gotham,
+                    TextTruncate = Enum.TextTruncate.AtEnd
                 })
                 
                 local ToggleButton = CreateElement("TextButton", {
@@ -1221,13 +1233,14 @@ function Library:CreateWindow(config)
                     Name = "Label",
                     Parent = Dropdown,
                     Position = UDim2.new(0, 12, 0, 0),
-                    Size = UDim2.new(1, -24, 0, 38),
+                    Size = UDim2.new(1, -40, 0, 38),
                     BackgroundTransparency = 1,
                     Text = Name .. ": " .. currentValue,
                     TextColor3 = Theme.Text,
                     TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    Font = Enum.Font.Gotham
+                    Font = Enum.Font.Gotham,
+                    TextTruncate = Enum.TextTruncate.AtEnd
                 })
                 
                 local DropdownButton = CreateElement("TextButton", {
@@ -1262,7 +1275,14 @@ function Library:CreateWindow(config)
                     BorderSizePixel = 0,
                     Visible = false,
                     ClipsDescendants = true,
-                    ZIndex = 5
+                    ZIndex = 100
+                })
+                
+                CreateElement("UIStroke", {
+                    Parent = OptionsContainer,
+                    Color = Theme.Border,
+                    Thickness = 1,
+                    Transparency = 0.3
                 })
                 
                 CreateElement("UICorner", {
@@ -1319,7 +1339,7 @@ function Library:CreateWindow(config)
                         TextXAlignment = Enum.TextXAlignment.Left,
                         Font = Enum.Font.Gotham,
                         AutoButtonColor = false,
-                        ZIndex = 6
+                        ZIndex = 101
                     })
                     
                     OptionButton.MouseButton1Click:Connect(function()
@@ -1404,12 +1424,14 @@ function Library:CreateWindow(config)
                 local ButtonLabel = CreateElement("TextLabel", {
                     Name = "Label",
                     Parent = Button,
-                    Size = UDim2.new(1, 0, 1, 0),
+                    Size = UDim2.new(1, -24, 1, 0),
+                    Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
                     Text = Name,
                     TextColor3 = Theme.Text,
                     TextSize = 13,
-                    Font = Enum.Font.Gotham
+                    Font = Enum.Font.Gotham,
+                    TextTruncate = Enum.TextTruncate.AtEnd
                 })
                 
                 Button.MouseButton1Click:Connect(function()
@@ -1655,7 +1677,7 @@ function Library:CreateWindow(config)
                     BorderSizePixel = 0,
                     Visible = false,
                     ClipsDescendants = true,
-                    ZIndex = 10
+                    ZIndex = 100
                 })
                 
                 CreateElement("UICorner", {
@@ -1678,7 +1700,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromHSV(h / 360, 1, 1),
                     BorderSizePixel = 0,
                     AutoButtonColor = false,
-                    ZIndex = 11
+                    ZIndex = 101
                 })
                 
                 CreateElement("UICorner", {
@@ -1702,7 +1724,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(0, 0, 0),
                     BackgroundTransparency = 0,
                     BorderSizePixel = 0,
-                    ZIndex = 12
+                    ZIndex = 102
                 })
                 
                 CreateElement("UICorner", {
@@ -1731,7 +1753,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BorderSizePixel = 2,
                     BorderColor3 = Color3.fromRGB(0, 0, 0),
-                    ZIndex = 15
+                    ZIndex = 105
                 })
                 
                 CreateElement("UICorner", {
@@ -1748,7 +1770,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BorderSizePixel = 0,
                     AutoButtonColor = false,
-                    ZIndex = 11
+                    ZIndex = 101
                 })
                 
                 CreateElement("UICorner", {
@@ -1779,7 +1801,7 @@ function Library:CreateWindow(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BorderSizePixel = 1,
                     BorderColor3 = Color3.fromRGB(0, 0, 0),
-                    ZIndex = 15
+                    ZIndex = 105
                 })
                 
                 -- RGB Display
@@ -1793,7 +1815,7 @@ function Library:CreateWindow(config)
                     TextColor3 = Theme.Text,
                     TextSize = 11,
                     Font = Enum.Font.Gotham,
-                    ZIndex = 11
+                    ZIndex = 101
                 })
                 
                 local function UpdateColor()
@@ -1999,7 +2021,8 @@ function Library:CreateWindow(config)
             Position = UDim2.new(1, 10, 1, -100),
             Size = UDim2.new(0, 280, 0, 70),
             BackgroundColor3 = Theme.Secondary,
-            BorderSizePixel = 0
+            BorderSizePixel = 0,
+            ZIndex = 1000
         })
         
         CreateElement("UICorner", {
@@ -2018,7 +2041,8 @@ function Library:CreateWindow(config)
             Parent = Notification,
             Size = UDim2.new(0, 4, 1, 0),
             BackgroundColor3 = TypeColors[Type] or Theme.Accent,
-            BorderSizePixel = 0
+            BorderSizePixel = 0,
+            ZIndex = 1001
         })
         
         CreateElement("UICorner", {
@@ -2036,7 +2060,8 @@ function Library:CreateWindow(config)
             TextColor3 = Theme.Text,
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Font = Enum.Font.GothamBold
+            Font = Enum.Font.GothamBold,
+            ZIndex = 1001
         })
         
         local NotifContent = CreateElement("TextLabel", {
@@ -2051,7 +2076,8 @@ function Library:CreateWindow(config)
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
             Font = Enum.Font.Gotham,
-            TextWrapped = true
+            TextWrapped = true,
+            ZIndex = 1001
         })
         
         Tween(Notification, {Position = UDim2.new(1, -290, 1, -100)}, 0.4, Enum.EasingStyle.Back)
