@@ -291,6 +291,8 @@ function Library:CreateWindow(config)
         Keybinds = {}
     }
     
+    local AllSections = {}
+    
     -- Create ScreenGui
     local ScreenGui = CreateElement("ScreenGui", {
         Name = "ModernUI_" .. HttpService:GenerateGUID(false):sub(1, 8),
@@ -525,6 +527,39 @@ function Library:CreateWindow(config)
     end)
     
     -- ════════════════════════════════════════════════════════════════════════
+    -- REFRESH THEME FUNCTION
+    -- ════════════════════════════════════════════════════════════════════════
+    
+    function Window:RefreshTheme()
+        MainFrame.BackgroundColor3 = Theme.Background
+        TitleBar.BackgroundColor3 = Theme.Sidebar
+        TitleBarCover.BackgroundColor3 = Theme.Sidebar
+        StatusIndicator.BackgroundColor3 = Theme.Success
+        TitleLabel.TextColor3 = Theme.Text
+        SubtitleLabel.TextColor3 = Theme.TextMuted
+        MinimizeButton.TextColor3 = Theme.TextDark
+        CloseButton.TextColor3 = Theme.TextDark
+        Sidebar.BackgroundColor3 = Theme.Sidebar
+        
+        for _, page in pairs(Window.Pages) do
+            page.Button.BackgroundColor3 = page.Visible and Theme.SidebarActive or Theme.Sidebar
+            if page.Button:FindFirstChild("Icon") then
+                page.Button.Icon.ImageColor3 = page.Visible and Theme.Text or Theme.TextDark
+            end
+            page.Frame.ScrollBarImageColor3 = Theme.Accent
+        end
+        
+        for _, section in pairs(AllSections) do
+            section.Frame.Title.TextColor3 = Theme.Text
+            for _, elem in pairs(section.Elements) do
+                if elem.RefreshTheme then
+                    elem:RefreshTheme()
+                end
+            end
+        end
+    end
+    
+    -- ════════════════════════════════════════════════════════════════════════
     -- CREATE PAGE
     -- ════════════════════════════════════════════════════════════════════════
     
@@ -722,6 +757,7 @@ function Library:CreateWindow(config)
             
             Section.Left = LeftColumn
             Section.Right = RightColumn
+            Section.Frame = SectionFrame
             
             local function GetSmallestColumn()
                 return LeftColumn.AbsoluteSize.Y <= RightColumn.AbsoluteSize.Y and LeftColumn or RightColumn
@@ -803,11 +839,17 @@ function Library:CreateWindow(config)
                     AutomaticSize = Enum.AutomaticSize.Y
                 })
                 
-                return {
+                local LabelObject = {
                     SetText = function(text)
                         Label.Text = text
+                    end,
+                    RefreshTheme = function()
+                        Label.TextColor3 = Theme.TextDark
                     end
                 }
+                
+                table.insert(Section.Elements, LabelObject)
+                return LabelObject
             end
             
             -- ════════════════════════════════════════════════════════════════════════
@@ -826,6 +868,13 @@ function Library:CreateWindow(config)
                     BorderSizePixel = 0
                 })
                 
+                local DividerObject = {
+                    RefreshTheme = function()
+                        Divider.BackgroundColor3 = Theme.Border
+                    end
+                }
+                
+                table.insert(Section.Elements, DividerObject)
                 return Divider
             end
             
@@ -882,14 +931,21 @@ function Library:CreateWindow(config)
                     LayoutOrder = 2
                 })
                 
-                return {
+                local ParagraphObject = {
                     SetTitle = function(title)
                         ParagraphTitle.Text = title
                     end,
                     SetContent = function(content)
                         ParagraphContent.Text = content
+                    end,
+                    RefreshTheme = function()
+                        ParagraphTitle.TextColor3 = Theme.Text
+                        ParagraphContent.TextColor3 = Theme.TextDark
                     end
                 }
+                
+                table.insert(Section.Elements, ParagraphObject)
+                return ParagraphObject
             end
             
             -- ════════════════════════════════════════════════════════════════════════
@@ -920,7 +976,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local ToggleStroke = CreateElement("UIStroke", {
                     Parent = Toggle,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1012,6 +1068,21 @@ function Library:CreateWindow(config)
                         if overlay then
                             overlay:Destroy()
                         end
+                    end,
+                    RefreshTheme = function()
+                        Toggle.BackgroundColor3 = Theme.Secondary
+                        ToggleStroke.Color = Theme.Border
+                        ToggleLabel.TextColor3 = Theme.Text
+                        ToggleButton.BackgroundColor3 = currentValue and Theme.ToggleOn or Theme.ToggleOff
+                        ToggleCircle.BackgroundColor3 = Theme.Text
+                        local overlay = Toggle:FindFirstChild("LockedOverlay")
+                        if overlay then
+                            overlay.Lock.ImageColor3 = Theme.Warning
+                            local reasonLabel = overlay:FindFirstChild("Reason")
+                            if reasonLabel then
+                                reasonLabel.TextColor3 = Theme.Warning
+                            end
+                        end
                     end
                 }
                 
@@ -1051,7 +1122,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local SliderStroke = CreateElement("UIStroke", {
                     Parent = Slider,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1188,6 +1259,23 @@ function Library:CreateWindow(config)
                         if overlay then
                             overlay:Destroy()
                         end
+                    end,
+                    RefreshTheme = function()
+                        Slider.BackgroundColor3 = Theme.Secondary
+                        SliderStroke.Color = Theme.Border
+                        SliderLabel.TextColor3 = Theme.Text
+                        SliderValue.TextColor3 = Theme.Accent
+                        SliderTrack.BackgroundColor3 = Theme.Tertiary
+                        SliderFill.BackgroundColor3 = Theme.Accent
+                        SliderDot.BackgroundColor3 = Theme.Text
+                        local overlay = Slider:FindFirstChild("LockedOverlay")
+                        if overlay then
+                            overlay.Lock.ImageColor3 = Theme.Warning
+                            local reasonLabel = overlay:FindFirstChild("Reason")
+                            if reasonLabel then
+                                reasonLabel.TextColor3 = Theme.Warning
+                            end
+                        end
                     end
                 }
                 
@@ -1226,7 +1314,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local DropdownStroke = CreateElement("UIStroke", {
                     Parent = Dropdown,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1288,7 +1376,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local OptionsStroke = CreateElement("UIStroke", {
                     Parent = OptionsContainer,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1422,6 +1510,28 @@ function Library:CreateWindow(config)
                         if overlay then
                             overlay:Destroy()
                         end
+                    end,
+                    RefreshTheme = function()
+                        Dropdown.BackgroundColor3 = Theme.Secondary
+                        DropdownStroke.Color = Theme.Border
+                        DropdownLabel.TextColor3 = Theme.Text
+                        DropdownArrow.TextColor3 = Theme.TextDark
+                        OptionsContainer.BackgroundColor3 = Theme.Tertiary
+                        OptionsStroke.Color = Theme.Border
+                        for _, option in pairs(OptionsContainer:GetChildren()) do
+                            if option:IsA("TextButton") then
+                                option.BackgroundColor3 = Theme.Tertiary
+                                option.TextColor3 = Theme.Text
+                            end
+                        end
+                        local overlay = Dropdown:FindFirstChild("LockedOverlay")
+                        if overlay then
+                            overlay.Lock.ImageColor3 = Theme.Warning
+                            local reasonLabel = overlay:FindFirstChild("Reason")
+                            if reasonLabel then
+                                reasonLabel.TextColor3 = Theme.Warning
+                            end
+                        end
                     end
                 }
                 
@@ -1456,7 +1566,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local ButtonStroke = CreateElement("UIStroke", {
                     Parent = Button,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1513,6 +1623,19 @@ function Library:CreateWindow(config)
                         if overlay then
                             overlay:Destroy()
                         end
+                    end,
+                    RefreshTheme = function()
+                        Button.BackgroundColor3 = Theme.Secondary
+                        ButtonStroke.Color = Theme.Border
+                        ButtonLabel.TextColor3 = Theme.Text
+                        local overlay = Button:FindFirstChild("LockedOverlay")
+                        if overlay then
+                            overlay.Lock.ImageColor3 = Theme.Warning
+                            local reasonLabel = overlay:FindFirstChild("Reason")
+                            if reasonLabel then
+                                reasonLabel.TextColor3 = Theme.Warning
+                            end
+                        end
                     end
                 }
                 
@@ -1548,7 +1671,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local TextboxStroke = CreateElement("UIStroke", {
                     Parent = Textbox,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1623,6 +1746,21 @@ function Library:CreateWindow(config)
                         if overlay then
                             overlay:Destroy()
                         end
+                    end,
+                    RefreshTheme = function()
+                        Textbox.BackgroundColor3 = Theme.Secondary
+                        TextboxStroke.Color = Theme.Border
+                        TextboxLabel.TextColor3 = Theme.TextDark
+                        TextboxInput.TextColor3 = Theme.Text
+                        TextboxInput.PlaceholderColor3 = Theme.TextMuted
+                        local overlay = Textbox:FindFirstChild("LockedOverlay")
+                        if overlay then
+                            overlay.Lock.ImageColor3 = Theme.Warning
+                            local reasonLabel = overlay:FindFirstChild("Reason")
+                            if reasonLabel then
+                                reasonLabel.TextColor3 = Theme.Warning
+                            end
+                        end
                     end
                 }
                 
@@ -1659,7 +1797,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local ColorPickerStroke = CreateElement("UIStroke", {
                     Parent = ColorPicker,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -1694,7 +1832,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 5)
                 })
                 
-                CreateElement("UIStroke", {
+                local ColorDisplayStroke = CreateElement("UIStroke", {
                     Parent = ColorDisplay,
                     Color = Theme.Border,
                     Thickness = 2
@@ -1727,7 +1865,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local PickerWindowStroke = CreateElement("UIStroke", {
                     Parent = PickerWindow,
                     Color = Theme.Border,
                     Thickness = 1
@@ -1963,6 +2101,15 @@ function Library:CreateWindow(config)
                         if not skipCallback then
                             pcall(Callback, color)
                         end
+                    end,
+                    RefreshTheme = function()
+                        ColorPicker.BackgroundColor3 = Theme.Secondary
+                        ColorPickerStroke.Color = Theme.Border
+                        PickerLabel.TextColor3 = Theme.Text
+                        ColorDisplayStroke.Color = Theme.Border
+                        PickerWindow.BackgroundColor3 = Theme.Tertiary
+                        PickerWindowStroke.Color = Theme.Border
+                        RGBDisplay.TextColor3 = Theme.Text
                     end
                 }
                 
@@ -1997,7 +2144,7 @@ function Library:CreateWindow(config)
                     CornerRadius = UDim.new(0, 6)
                 })
                 
-                CreateElement("UIStroke", {
+                local KeybindStroke = CreateElement("UIStroke", {
                     Parent = Keybind,
                     Color = Theme.Border,
                     Thickness = 1,
@@ -2049,6 +2196,7 @@ function Library:CreateWindow(config)
                         KeyButton.Text = currentKey.Name
                         listening = false
                         Tween(KeyButton, {BackgroundColor3 = Theme.Tertiary}, 0.2)
+
                     end
                     
                     if not gameProcessed and input.KeyCode == currentKey then
