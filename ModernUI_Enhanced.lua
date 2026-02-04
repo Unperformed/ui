@@ -1,11 +1,17 @@
 --[[
     ════════════════════════════════════════════════════════════════════════
     PROFESSIONAL ROBLOX UI LIBRARY - COMPLETE EDITION
-    Version: 3.0.0
-    Features: Everything a UI Library should have
+    Version: 4.0.0
+    Features: Everything a UI Library should have + MORE!
     ════════════════════════════════════════════════════════════════════════
     
-    NEW FEATURES IN V3.0:
+    NEW FEATURES IN V4.0:
+    ✓ Dynamic Corner Tags (FPS/Ping/Custom displays)
+    ✓ Toggle UI Keybind (Show/Hide with keyboard shortcut)
+    ✓ Paragraph Image Support (Display images in paragraphs)
+    ✓ Window Customization (Author field, custom icons, mobile buttons)
+    
+    FEATURES FROM V3.0:
     ✓ Color Pickers with RGB/HSV
     ✓ Keybind System
     ✓ Multi-theme Support (6 themes)
@@ -26,6 +32,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
+local Stats = game:GetService("Stats")
 
 -- ════════════════════════════════════════════════════════════════════════
 -- THEME PRESETS - EASILY CHANGE YOUR UI THEME HERE!
@@ -275,8 +282,11 @@ function Library:CreateWindow(config)
     config = config or {}
     local Title = config.Title or "Script Hub"
     local Subtitle = config.Subtitle or "script.lua"
+    local Author = config.Author or nil -- NEW: Author name
+    local Icon = config.Icon or nil -- NEW: Custom icon
     local Size = config.Size or UDim2.new(0, IsMobile() and 500 or 720, 0, IsMobile() and 550 or 480)
     local ThemeName = config.Theme or ACTIVE_THEME
+    local ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift -- NEW: UI toggle keybind
     
     -- Override theme if specified
     if ThemeName and ThemePresets[ThemeName] then
@@ -288,7 +298,9 @@ function Library:CreateWindow(config)
         CurrentPage = nil,
         Minimized = false,
         OriginalSize = Size,
-        Keybinds = {}
+        Keybinds = {},
+        Tags = {}, -- NEW: Store corner tags
+        Visible = true -- NEW: Track visibility state
     }
     
     local AllSections = {}
@@ -383,11 +395,28 @@ function Library:CreateWindow(config)
         end
     end)
     
+    -- Custom Icon (NEW)
+    local titleXOffset = 30
+    if Icon then
+        local CustomIcon = CreateElement("ImageLabel", {
+            Name = "CustomIcon",
+            Parent = TitleBar,
+            Position = UDim2.new(0, 28, 0.5, 0),
+            Size = UDim2.new(0, 24, 0, 24),
+            AnchorPoint = Vector2.new(0, 0.5),
+            BackgroundTransparency = 1,
+            Image = Icon,
+            ImageColor3 = Theme.Accent,
+            ScaleType = Enum.ScaleType.Fit
+        })
+        titleXOffset = 58
+    end
+    
     local TitleLabel = CreateElement("TextLabel", {
         Name = "Title",
         Parent = TitleBar,
-        Position = UDim2.new(0, 30, 0, 0),
-        Size = UDim2.new(1, -140, 0, 45),
+        Position = UDim2.new(0, titleXOffset, 0, Author and 8 or 0),
+        Size = UDim2.new(1, -140, 0, Author and 20 or 45),
         BackgroundTransparency = 1,
         Text = Title,
         TextColor3 = Theme.Text,
@@ -395,6 +424,22 @@ function Library:CreateWindow(config)
         TextXAlignment = Enum.TextXAlignment.Left,
         Font = Enum.Font.GothamBold
     })
+    
+    -- Author Label (NEW)
+    if Author then
+        local AuthorLabel = CreateElement("TextLabel", {
+            Name = "Author",
+            Parent = TitleBar,
+            Position = UDim2.new(0, titleXOffset, 0, 28),
+            Size = UDim2.new(1, -140, 0, 15),
+            BackgroundTransparency = 1,
+            Text = "by " .. Author,
+            TextColor3 = Theme.TextMuted,
+            TextSize = 11,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Font = Enum.Font.Gotham
+        })
+    end
     
     local SubtitleLabel = CreateElement("TextLabel", {
         Name = "Subtitle",
@@ -527,6 +572,188 @@ function Library:CreateWindow(config)
     end)
     
     -- ════════════════════════════════════════════════════════════════════════
+    -- UI TOGGLE KEYBIND (NEW IN V4.0)
+    -- ════════════════════════════════════════════════════════════════════════
+    
+    -- Toggle UI visibility with keybind
+    function Window:Toggle()
+        Window.Visible = not Window.Visible
+        MainFrame.Visible = Window.Visible
+    end
+    
+    -- Listen for toggle key
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == ToggleKey then
+            Window:Toggle()
+        end
+    end)
+    
+    -- ════════════════════════════════════════════════════════════════════════
+    -- CORNER TAGS SYSTEM (NEW IN V4.0)
+    -- ════════════════════════════════════════════════════════════════════════
+    
+    local TagsContainer = CreateElement("Frame", {
+        Name = "TagsContainer",
+        Parent = ScreenGui,
+        Position = UDim2.new(1, -10, 0, 10),
+        Size = UDim2.new(0, 200, 0, 0),
+        AnchorPoint = Vector2.new(1, 0),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0
+    })
+    
+    CreateElement("UIListLayout", {
+        Parent = TagsContainer,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 6),
+        HorizontalAlignment = Enum.HorizontalAlignment.Right
+    })
+    
+    function Window:CreateTag(config)
+        config = config or {}
+        local Name = config.Name or "Tag"
+        local InitialValue = config.Value or "N/A"
+        local Color = config.Color or Theme.Accent
+        local UpdateCallback = config.Update or nil
+        
+        local Tag = {}
+        
+        -- Tag Frame
+        local TagFrame = CreateElement("Frame", {
+            Name = Name,
+            Parent = TagsContainer,
+            Size = UDim2.new(0, 0, 0, 28),
+            BackgroundColor3 = Theme.Secondary,
+            BorderSizePixel = 0,
+            AutomaticSize = Enum.AutomaticSize.X
+        })
+        
+        CreateElement("UICorner", {
+            Parent = TagFrame,
+            CornerRadius = UDim.new(0, 6)
+        })
+        
+        CreateElement("UIStroke", {
+            Parent = TagFrame,
+            Color = Color,
+            Thickness = 1,
+            Transparency = 0.5
+        })
+        
+        CreateElement("UIPadding", {
+            Parent = TagFrame,
+            PaddingLeft = UDim.new(0, 10),
+            PaddingRight = UDim.new(0, 10),
+            PaddingTop = UDim.new(0, 4),
+            PaddingBottom = UDim.new(0, 4)
+        })
+        
+        local TagLayout = CreateElement("UIListLayout", {
+            Parent = TagFrame,
+            FillDirection = Enum.FillDirection.Horizontal,
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 6),
+            VerticalAlignment = Enum.VerticalAlignment.Center
+        })
+        
+        local TagLabel = CreateElement("TextLabel", {
+            Name = "Label",
+            Parent = TagFrame,
+            Size = UDim2.new(0, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = Name .. ":",
+            TextColor3 = Theme.TextDark,
+            TextSize = 12,
+            Font = Enum.Font.GothamMedium,
+            AutomaticSize = Enum.AutomaticSize.X,
+            LayoutOrder = 1
+        })
+        
+        local TagValue = CreateElement("TextLabel", {
+            Name = "Value",
+            Parent = TagFrame,
+            Size = UDim2.new(0, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = tostring(InitialValue),
+            TextColor3 = Color,
+            TextSize = 12,
+            Font = Enum.Font.GothamBold,
+            AutomaticSize = Enum.AutomaticSize.X,
+            LayoutOrder = 2
+        })
+        
+        function Tag:Update(value)
+            TagValue.Text = tostring(value)
+        end
+        
+        function Tag:SetColor(color)
+            TagValue.TextColor3 = color
+            TagFrame.UIStroke.Color = color
+        end
+        
+        function Tag:Remove()
+            TagFrame:Destroy()
+        end
+        
+        -- Auto-update if callback provided
+        if UpdateCallback then
+            task.spawn(function()
+                while TagFrame.Parent do
+                    local success, value = pcall(UpdateCallback)
+                    if success and value then
+                        Tag:Update(value)
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+        
+        Window.Tags[Name] = Tag
+        return Tag
+    end
+    
+    -- Preset tags for FPS and Ping
+    function Window:AddFPSTag()
+        local lastUpdate = tick()
+        local fps = 0
+        
+        RunService.Heartbeat:Connect(function()
+            local now = tick()
+            fps = math.floor(1 / (now - lastUpdate))
+            lastUpdate = now
+        end)
+        
+        return Window:CreateTag({
+            Name = "FPS",
+            Value = "60",
+            Color = Theme.Success,
+            Update = function()
+                local color = fps >= 60 and Theme.Success or fps >= 30 and Theme.Warning or Theme.Error
+                if Window.Tags["FPS"] then
+                    Window.Tags["FPS"]:SetColor(color)
+                end
+                return fps
+            end
+        })
+    end
+    
+    function Window:AddPingTag()
+        return Window:CreateTag({
+            Name = "Ping",
+            Value = "0ms",
+            Color = Theme.Info,
+            Update = function()
+                local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+                local color = ping < 100 and Theme.Success or ping < 200 and Theme.Warning or Theme.Error
+                if Window.Tags["Ping"] then
+                    Window.Tags["Ping"]:SetColor(color)
+                end
+                return ping .. "ms"
+            end
+        })
+    end
+    
+    -- ════════════════════════════════════════════════════════════════════════
     -- REFRESH THEME FUNCTION
     -- ════════════════════════════════════════════════════════════════════════
     
@@ -540,6 +767,23 @@ function Library:CreateWindow(config)
         MinimizeButton.TextColor3 = Theme.TextDark
         CloseButton.TextColor3 = Theme.TextDark
         Sidebar.BackgroundColor3 = Theme.Sidebar
+        
+        -- Refresh custom icon color if present
+        if TitleBar:FindFirstChild("CustomIcon") then
+            TitleBar.CustomIcon.ImageColor3 = Theme.Accent
+        end
+        
+        -- Refresh author label if present
+        if TitleBar:FindFirstChild("Author") then
+            TitleBar.Author.TextColor3 = Theme.TextMuted
+        end
+        
+        -- Refresh all tags
+        for _, tag in pairs(Window.Tags) do
+            if tag.RefreshTheme then
+                tag:RefreshTheme()
+            end
+        end
         
         for _, page in pairs(Window.Pages) do
             page.Button.BackgroundColor3 = page.Visible and Theme.SidebarActive or Theme.Sidebar
@@ -888,6 +1132,8 @@ function Library:CreateWindow(config)
                 config = config or {}
                 local Title = config.Title or "Paragraph"
                 local Content = config.Content or "Content"
+                local Image = config.Image or nil -- NEW: Optional image
+                local ImageSize = config.ImageSize or UDim2.new(0, 80, 0, 80) -- NEW: Image size
                 local Column = config.Column or GetSmallestColumn()
                 
                 local Container = CreateElement("Frame", {
@@ -901,7 +1147,7 @@ function Library:CreateWindow(config)
                 CreateElement("UIListLayout", {
                     Parent = Container,
                     SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 3)
+                    Padding = UDim.new(0, 6)
                 })
                 
                 local ParagraphTitle = CreateElement("TextLabel", {
@@ -917,6 +1163,46 @@ function Library:CreateWindow(config)
                     LayoutOrder = 1
                 })
                 
+                -- Image Container (NEW)
+                local ImageFrame = nil
+                if Image then
+                    ImageFrame = CreateElement("Frame", {
+                        Name = "ImageContainer",
+                        Parent = Container,
+                        Size = ImageSize,
+                        BackgroundColor3 = Theme.Tertiary,
+                        BorderSizePixel = 0,
+                        LayoutOrder = 2
+                    })
+                    
+                    CreateElement("UICorner", {
+                        Parent = ImageFrame,
+                        CornerRadius = UDim.new(0, 6)
+                    })
+                    
+                    CreateElement("UIStroke", {
+                        Parent = ImageFrame,
+                        Color = Theme.Border,
+                        Thickness = 1,
+                        Transparency = 0.5
+                    })
+                    
+                    local ImageLabel = CreateElement("ImageLabel", {
+                        Name = "Image",
+                        Parent = ImageFrame,
+                        Size = UDim2.new(1, -4, 1, -4),
+                        Position = UDim2.new(0, 2, 0, 2),
+                        BackgroundTransparency = 1,
+                        Image = Image,
+                        ScaleType = Enum.ScaleType.Fit
+                    })
+                    
+                    CreateElement("UICorner", {
+                        Parent = ImageLabel,
+                        CornerRadius = UDim.new(0, 5)
+                    })
+                end
+                
                 local ParagraphContent = CreateElement("TextLabel", {
                     Name = "Content",
                     Parent = Container,
@@ -930,7 +1216,7 @@ function Library:CreateWindow(config)
                     Font = Enum.Font.Gotham,
                     TextWrapped = true,
                     AutomaticSize = Enum.AutomaticSize.Y,
-                    LayoutOrder = 2
+                    LayoutOrder = 3
                 })
                 
                 local ParagraphObject = {
@@ -940,9 +1226,18 @@ function Library:CreateWindow(config)
                     SetContent = function(content)
                         ParagraphContent.Text = content
                     end,
+                    SetImage = function(imageId)
+                        if ImageFrame then
+                            ImageFrame.Image.Image = imageId
+                        end
+                    end,
                     RefreshTheme = function()
                         ParagraphTitle.TextColor3 = Theme.Text
                         ParagraphContent.TextColor3 = Theme.TextDark
+                        if ImageFrame then
+                            ImageFrame.BackgroundColor3 = Theme.Tertiary
+                            ImageFrame.UIStroke.Color = Theme.Border
+                        end
                     end
                 }
                 
