@@ -2230,9 +2230,28 @@ function Library:CreateWindow(config)
         return Page
     end
     
+    
     -- ════════════════════════════════════════════════════════════════════════
-    -- NOTIFICATION SYSTEM
+    -- REDESIGNED NOTIFICATION SYSTEM - CLEAN & MODERN ✨
     -- ════════════════════════════════════════════════════════════════════════
+    
+    local NotificationContainer = CreateElement("Frame", {
+        Name = "NotificationContainer",
+        Parent = ScreenGui,
+        AnchorPoint = Vector2.new(1, 1),
+        Position = UDim2.new(1, -20, 1, -20),
+        Size = UDim2.new(0, 340, 1, 0),
+        BackgroundTransparency = 1,
+        ZIndex = 10000
+    })
+    
+    local NotificationLayout = CreateElement("UIListLayout", {
+        Parent = NotificationContainer,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 10),
+        VerticalAlignment = Enum.VerticalAlignment.Bottom,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right
+    })
     
     function Window:Notify(config)
         config = config or {}
@@ -2248,79 +2267,231 @@ function Library:CreateWindow(config)
             Error = Theme.Error
         }
         
+        local TypeIcons = {
+            Info = "ℹ️",
+            Success = "✓",
+            Warning = "⚠",
+            Error = "✕"
+        }
+        
+        local accentColor = TypeColors[Type] or Theme.Accent
+        
+        -- Main Notification Frame
         local Notification = CreateElement("Frame", {
             Name = "Notification",
-            Parent = ScreenGui,
-            Position = UDim2.new(1, 10, 1, -100),
-            Size = UDim2.new(0, 280, 0, 70),
+            Parent = NotificationContainer,
+            Size = UDim2.new(1, 0, 0, 90),
             BackgroundColor3 = Theme.Secondary,
             BorderSizePixel = 0,
-            ZIndex = 1000
+            ClipsDescendants = false,
+            BackgroundTransparency = 1
+        })
+        
+        -- Animate in from right
+        Notification.Position = UDim2.new(1, 50, 0, 0)
+        
+        -- Inner container for rounded corners
+        local InnerFrame = CreateElement("Frame", {
+            Name = "Inner",
+            Parent = Notification,
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundColor3 = Theme.Secondary,
+            BorderSizePixel = 0
         })
         
         CreateElement("UICorner", {
-            Parent = Notification,
-            CornerRadius = UDim.new(0, 8)
+            Parent = InnerFrame,
+            CornerRadius = UDim.new(0, 12)
         })
         
-        local NotifStroke = CreateElement("UIStroke", {
-            Parent = Notification,
-            Color = TypeColors[Type] or Theme.Accent,
-            Thickness = 2
-        })
-        
-        local ColorBar = CreateElement("Frame", {
-            Name = "Bar",
-            Parent = Notification,
-            Size = UDim2.new(0, 4, 1, 0),
-            BackgroundColor3 = TypeColors[Type] or Theme.Accent,
+        -- Subtle gradient overlay
+        local Gradient = CreateElement("Frame", {
+            Name = "Gradient",
+            Parent = InnerFrame,
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 0.95,
+            BackgroundColor3 = accentColor,
             BorderSizePixel = 0,
-            ZIndex = 1001
+            ZIndex = 1
         })
         
         CreateElement("UICorner", {
-            Parent = ColorBar,
-            CornerRadius = UDim.new(0, 8)
+            Parent = Gradient,
+            CornerRadius = UDim.new(0, 12)
         })
         
-        local NotifTitle = CreateElement("TextLabel", {
-            Name = "Title",
+        -- Drop shadow
+        local Shadow = CreateElement("ImageLabel", {
+            Name = "Shadow",
             Parent = Notification,
-            Position = UDim2.new(0, 15, 0, 8),
-            Size = UDim2.new(1, -30, 0, 18),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            Size = UDim2.new(1, 40, 1, 40),
+            BackgroundTransparency = 1,
+            Image = "rbxassetid://6014261993",
+            ImageColor3 = Color3.fromRGB(0, 0, 0),
+            ImageTransparency = 0.6,
+            ScaleType = Enum.ScaleType.Slice,
+            SliceCenter = Rect.new(100, 100, 100, 100),
+            ZIndex = -1
+        })
+        
+        -- Subtle border
+        local Border = CreateElement("UIStroke", {
+            Parent = InnerFrame,
+            Color = accentColor,
+            Thickness = 1,
+            Transparency = 0.7
+        })
+        
+        -- Icon background circle
+        local IconBg = CreateElement("Frame", {
+            Name = "IconBg",
+            Parent = InnerFrame,
+            Position = UDim2.new(0, 16, 0, 16),
+            Size = UDim2.new(0, 40, 0, 40),
+            BackgroundColor3 = accentColor,
+            BackgroundTransparency = 0.9,
+            BorderSizePixel = 0,
+            ZIndex = 2
+        })
+        
+        CreateElement("UICorner", {
+            Parent = IconBg,
+            CornerRadius = UDim.new(1, 0)
+        })
+        
+        -- Icon
+        local Icon = CreateElement("TextLabel", {
+            Name = "Icon",
+            Parent = IconBg,
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = TypeIcons[Type] or "ℹ️",
+            TextColor3 = accentColor,
+            TextSize = 20,
+            Font = Enum.Font.GothamBold,
+            ZIndex = 3
+        })
+        
+        -- Title
+        local TitleLabel = CreateElement("TextLabel", {
+            Name = "Title",
+            Parent = InnerFrame,
+            Position = UDim2.new(0, 68, 0, 16),
+            Size = UDim2.new(1, -100, 0, 20),
             BackgroundTransparency = 1,
             Text = Title,
             TextColor3 = Theme.Text,
-            TextSize = 13,
+            TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left,
             Font = Enum.Font.GothamBold,
-            ZIndex = 1001
+            ZIndex = 2
         })
         
-        local NotifContent = CreateElement("TextLabel", {
+        -- Content
+        local ContentLabel = CreateElement("TextLabel", {
             Name = "Content",
-            Parent = Notification,
-            Position = UDim2.new(0, 15, 0, 28),
-            Size = UDim2.new(1, -30, 1, -36),
+            Parent = InnerFrame,
+            Position = UDim2.new(0, 68, 0, 38),
+            Size = UDim2.new(1, -100, 0, 36),
             BackgroundTransparency = 1,
             Text = Content,
             TextColor3 = Theme.TextDark,
-            TextSize = 11,
+            TextSize = 12,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
             Font = Enum.Font.Gotham,
             TextWrapped = true,
-            ZIndex = 1001
+            ZIndex = 2
         })
         
-        Tween(Notification, {Position = UDim2.new(1, -290, 1, -100)}, 0.4, Enum.EasingStyle.Back)
+        -- Close button
+        local CloseBtn = CreateElement("TextButton", {
+            Name = "Close",
+            Parent = InnerFrame,
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(1, -12, 0, 12),
+            Size = UDim2.new(0, 24, 0, 24),
+            BackgroundColor3 = Theme.Tertiary,
+            BackgroundTransparency = 0.3,
+            BorderSizePixel = 0,
+            Text = "×",
+            TextColor3 = Theme.TextMuted,
+            TextSize = 18,
+            Font = Enum.Font.GothamBold,
+            AutoButtonColor = false,
+            ZIndex = 3
+        })
         
-        task.wait(Duration)
+        CreateElement("UICorner", {
+            Parent = CloseBtn,
+            CornerRadius = UDim.new(1, 0)
+        })
         
-        Tween(Notification, {Position = UDim2.new(1, 10, 1, -100)}, 0.3)
-        task.wait(0.3)
-        Notification:Destroy()
+        CloseBtn.MouseEnter:Connect(function()
+            Tween(CloseBtn, {BackgroundTransparency = 0, TextColor3 = Theme.Text}, 0.2)
+        end)
+        
+        CloseBtn.MouseLeave:Connect(function()
+            Tween(CloseBtn, {BackgroundTransparency = 0.3, TextColor3 = Theme.TextMuted}, 0.2)
+        end)
+        
+        -- Progress bar background
+        local ProgressBg = CreateElement("Frame", {
+            Name = "ProgressBg",
+            Parent = InnerFrame,
+            Position = UDim2.new(0, 0, 1, -3),
+            Size = UDim2.new(1, 0, 0, 3),
+            BackgroundColor3 = Theme.Tertiary,
+            BorderSizePixel = 0,
+            ZIndex = 2
+        })
+        
+        CreateElement("UICorner", {
+            Parent = ProgressBg,
+            CornerRadius = UDim.new(0, 12)
+        })
+        
+        -- Progress bar
+        local Progress = CreateElement("Frame", {
+            Name = "Progress",
+            Parent = ProgressBg,
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundColor3 = accentColor,
+            BorderSizePixel = 0,
+            ZIndex = 3
+        })
+        
+        CreateElement("UICorner", {
+            Parent = Progress,
+            CornerRadius = UDim.new(0, 12)
+        })
+        
+        -- Animate in with spring effect
+        local slideIn = Tween(Notification, {Position = UDim2.new(0, 0, 0, 0)}, 0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        local fadeIn = Tween(InnerFrame, {BackgroundTransparency = 0}, 0.3)
+        
+        -- Progress bar animation
+        local progressTween = TweenService:Create(Progress, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
+        progressTween:Play()
+        
+        -- Close function
+        local function CloseNotification()
+            progressTween:Cancel()
+            Tween(Notification, {Position = UDim2.new(1, 50, 0, 0)}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+            Tween(InnerFrame, {BackgroundTransparency = 1}, 0.3)
+            Tween(Shadow, {ImageTransparency = 1}, 0.3)
+            task.wait(0.3)
+            Notification:Destroy()
+        end
+        
+        CloseBtn.MouseButton1Click:Connect(CloseNotification)
+        
+        -- Auto close after duration
+        task.delay(Duration, CloseNotification)
     end
+    
     
     -- ════════════════════════════════════════════════════════════════════════
     -- THEME CHANGER
