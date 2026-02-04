@@ -286,7 +286,17 @@ function Library:CreateWindow(config)
     local Icon = config.Icon or nil -- NEW: Custom icon
     local Size = config.Size or UDim2.new(0, IsMobile() and 500 or 720, 0, IsMobile() and 550 or 480)
     local ThemeName = config.Theme or ACTIVE_THEME
-    local ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift -- NEW: UI toggle keybind
+    local ToggleKey = config.ToggleKey or Enum.KeyCode.LeftControl -- Changed default to LeftControl
+    
+    -- NEW: OpenButton configuration
+    local OpenButtonConfig = config.OpenButton or {
+        Enabled = true,
+        Title = "Open UI",
+        Draggable = true,
+        OnlyMobile = false,
+        Scale = 1,
+        Color = nil -- Uses theme accent by default
+    }
     
     -- Override theme if specified
     if ThemeName and ThemePresets[ThemeName] then
@@ -572,6 +582,154 @@ function Library:CreateWindow(config)
     end)
     
     -- ════════════════════════════════════════════════════════════════════════
+    -- OPEN BUTTON (NEW IN V4.0)
+    -- ════════════════════════════════════════════════════════════════════════
+    
+    local OpenButton = nil
+    
+    if OpenButtonConfig.Enabled and (not OpenButtonConfig.OnlyMobile or IsMobile()) then
+        local buttonScale = OpenButtonConfig.Scale or 1
+        local buttonSize = 50 * buttonScale
+        local buttonColor = OpenButtonConfig.Color or ColorSequence.new(Theme.Accent, Theme.AccentDark)
+        
+        OpenButton = CreateElement("Frame", {
+            Name = "OpenButton",
+            Parent = ScreenGui,
+            Position = UDim2.new(0.5, 0, 0, 20),
+            Size = UDim2.new(0, buttonSize + 120, 0, buttonSize),
+            AnchorPoint = Vector2.new(0.5, 0),
+            BackgroundColor3 = Theme.Secondary,
+            BorderSizePixel = 0,
+            Visible = false,
+            ZIndex = 1000
+        })
+        
+        CreateElement("UICorner", {
+            Parent = OpenButton,
+            CornerRadius = UDim.new(0, 10)
+        })
+        
+        CreateElement("UIStroke", {
+            Parent = OpenButton,
+            Color = Theme.Accent,
+            Thickness = 2,
+            Transparency = 0.3
+        })
+        
+        -- Gradient background
+        local Gradient = CreateElement("UIGradient", {
+            Parent = OpenButton
+        })
+        
+        if type(buttonColor) == "userdata" and buttonColor.ClassName == "ColorSequence" then
+            Gradient.Color = buttonColor
+        else
+            Gradient.Color = ColorSequence.new(Theme.Accent, Theme.AccentDark)
+        end
+        Gradient.Rotation = 45
+        
+        -- Icon circle
+        local IconCircle = CreateElement("Frame", {
+            Name = "Icon",
+            Parent = OpenButton,
+            Position = UDim2.new(0, 10, 0.5, 0),
+            Size = UDim2.new(0, buttonSize - 10, 0, buttonSize - 10),
+            AnchorPoint = Vector2.new(0, 0.5),
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 0.9,
+            BorderSizePixel = 0
+        })
+        
+        CreateElement("UICorner", {
+            Parent = IconCircle,
+            CornerRadius = UDim.new(1, 0)
+        })
+        
+        local IconLabel = CreateElement("TextLabel", {
+            Name = "IconText",
+            Parent = IconCircle,
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = "≡",
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextSize = 24 * buttonScale,
+            Font = Enum.Font.GothamBold
+        })
+        
+        -- Title text
+        local TitleLabel = CreateElement("TextLabel", {
+            Name = "Title",
+            Parent = OpenButton,
+            Position = UDim2.new(0, buttonSize + 5, 0, 0),
+            Size = UDim2.new(1, -buttonSize - 15, 1, 0),
+            BackgroundTransparency = 1,
+            Text = OpenButtonConfig.Title or "Open UI",
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextSize = 14 * buttonScale,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Font = Enum.Font.GothamBold,
+            TextWrapped = true
+        })
+        
+        -- Click to open
+        local ClickDetector = CreateElement("TextButton", {
+            Name = "Clicker",
+            Parent = OpenButton,
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = "",
+            ZIndex = 1001
+        })
+        
+        ClickDetector.MouseButton1Click:Connect(function()
+            Window:Toggle()
+        end)
+        
+        -- Hover effects
+        ClickDetector.MouseEnter:Connect(function()
+            Tween(OpenButton, {Size = UDim2.new(0, (buttonSize + 120) * 1.05, 0, buttonSize * 1.05)}, 0.2)
+            Tween(OpenButton.UIStroke, {Transparency = 0}, 0.2)
+        end)
+        
+        ClickDetector.MouseLeave:Connect(function()
+            Tween(OpenButton, {Size = UDim2.new(0, buttonSize + 120, 0, buttonSize)}, 0.2)
+            Tween(OpenButton.UIStroke, {Transparency = 0.3}, 0.2)
+        end)
+        
+        -- Draggable (if enabled)
+        if OpenButtonConfig.Draggable then
+            local dragging, dragInput, dragStart, startPos
+            
+            OpenButton.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    dragging = true
+                    dragStart = input.Position
+                    startPos = OpenButton.Position
+                    
+                    input.Changed:Connect(function()
+                        if input.UserInputState == Enum.UserInputState.End then
+                            dragging = false
+                        end
+                    end)
+                end
+            end)
+            
+            OpenButton.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                    dragInput = input
+                end
+            end)
+            
+            UserInputService.InputChanged:Connect(function(input)
+                if input == dragInput and dragging then
+                    local delta = input.Position - dragStart
+                    OpenButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+                end
+            end)
+        end
+    end
+    
+    -- ════════════════════════════════════════════════════════════════════════
     -- UI TOGGLE KEYBIND (NEW IN V4.0)
     -- ════════════════════════════════════════════════════════════════════════
     
@@ -579,6 +737,11 @@ function Library:CreateWindow(config)
     function Window:Toggle()
         Window.Visible = not Window.Visible
         MainFrame.Visible = Window.Visible
+        
+        -- Show/hide OpenButton
+        if OpenButton then
+            OpenButton.Visible = not Window.Visible
+        end
     end
     
     -- Listen for toggle key
