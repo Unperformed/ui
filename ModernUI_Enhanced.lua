@@ -2320,22 +2320,6 @@ function Library:CreateWindow(config)
             CornerRadius = UDim.new(0, 12)
         })
         
-        -- Drop shadow
-        local Shadow = CreateElement("ImageLabel", {
-            Name = "Shadow",
-            Parent = Notification,
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-            Size = UDim2.new(1, 40, 1, 40),
-            BackgroundTransparency = 1,
-            Image = "rbxassetid://6014261993",
-            ImageColor3 = Color3.fromRGB(0, 0, 0),
-            ImageTransparency = 0.6,
-            ScaleType = Enum.ScaleType.Slice,
-            SliceCenter = Rect.new(100, 100, 100, 100),
-            ZIndex = -1
-        })
-        
         -- Subtle border
         local Border = CreateElement("UIStroke", {
             Parent = InnerFrame,
@@ -2383,7 +2367,7 @@ function Library:CreateWindow(config)
             BackgroundTransparency = 1,
             Text = Title,
             TextColor3 = Theme.Text,
-            TextSize = 14,
+            TextSize = 16,
             TextXAlignment = Enum.TextXAlignment.Left,
             Font = Enum.Font.GothamBold,
             ZIndex = 2
@@ -2398,7 +2382,7 @@ function Library:CreateWindow(config)
             BackgroundTransparency = 1,
             Text = Content,
             TextColor3 = Theme.TextDark,
-            TextSize = 12,
+            TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
             Font = Enum.Font.Gotham,
@@ -2468,8 +2452,8 @@ function Library:CreateWindow(config)
             CornerRadius = UDim.new(0, 12)
         })
         
-        -- Animate in with spring effect
-        local slideIn = Tween(Notification, {Position = UDim2.new(0, 0, 0, 0)}, 0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        -- Animate in with smooth slide effect
+        local slideIn = Tween(Notification, {Position = UDim2.new(0, 0, 0, 0)}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         local fadeIn = Tween(InnerFrame, {BackgroundTransparency = 0}, 0.3)
         
         -- Progress bar animation
@@ -2479,9 +2463,8 @@ function Library:CreateWindow(config)
         -- Close function
         local function CloseNotification()
             progressTween:Cancel()
-            Tween(Notification, {Position = UDim2.new(1, 50, 0, 0)}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+            Tween(Notification, {Position = UDim2.new(1, 50, 0, 0)}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
             Tween(InnerFrame, {BackgroundTransparency = 1}, 0.3)
-            Tween(Shadow, {ImageTransparency = 1}, 0.3)
             task.wait(0.3)
             Notification:Destroy()
         end
