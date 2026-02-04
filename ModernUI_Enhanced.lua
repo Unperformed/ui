@@ -1,18 +1,23 @@
 --[[
     ════════════════════════════════════════════════════════════════════════
-    ULTRA CLEAN ROBLOX UI LIBRARY - V3.2 PROFESSIONAL EDITION
+    PROFESSIONAL ROBLOX UI LIBRARY - COMPLETE EDITION
+    Version: 3.0.0
+    Features: Everything a UI Library should have
     ════════════════════════════════════════════════════════════════════════
     
-    🎨 NEW ULTRA CLEAN DESIGN FEATURES:
-    ✓ Modern gradient backgrounds on all buttons
-    ✓ Smooth scale animations with bounce effects
-    ✓ Professional shadows and glow effects
-    ✓ Sleeker borders and rounded corners (increased from 8px to 10px)
-    ✓ Enhanced hover states with color transitions
-    ✓ Better visual hierarchy and spacing
-    ✓ Improved typography and contrast
-    ✓ Glassmorphism effects on key elements
-    ✓ Professional color palette with better gradients
+    NEW FEATURES IN V3.0:
+    ✓ Color Pickers with RGB/HSV
+    ✓ Keybind System
+    ✓ Multi-theme Support (6 themes)
+    ✓ Element Locking System
+    ✓ Labels, Dividers, Paragraphs
+    ✓ Input Validation
+    ✓ Bind System
+    ✓ Force State for Toggles
+    ✓ Console Output
+    ✓ Mini Color Pickers
+    ✓ Image Display
+    ✓ And much more!
 ]]
 
 local Library = {}
@@ -52,9 +57,7 @@ local ThemePresets = {
         Error = Color3.fromRGB(240, 71, 71),
         Info = Color3.fromRGB(52, 152, 219),
         ToggleOn = Color3.fromRGB(195, 126, 255),
-        ToggleOff = Color3.fromRGB(70, 70, 90),
-        Shadow = Color3.fromRGB(0, 0, 0),
-        Glow = Color3.fromRGB(195, 126, 255)
+        ToggleOff = Color3.fromRGB(70, 70, 90)
     },
     
     -- Vampire / Blood Red
@@ -188,7 +191,7 @@ local Theme = ThemePresets[ACTIVE_THEME]
 
 local function Tween(object, properties, duration, easingStyle, easingDirection)
     duration = duration or 0.3
-    easingStyle = easingStyle or Enum.EasingStyle.Quint
+    easingStyle = easingStyle or Enum.EasingStyle.Quad
     easingDirection = easingDirection or Enum.EasingDirection.Out
     
     local tween = TweenService:Create(object, TweenInfo.new(duration, easingStyle, easingDirection), properties)
@@ -207,79 +210,6 @@ end
 local function IsMobile()
     return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 end
-
-
--- ════════════════════════════════════════════════════════════════════════
--- MODERN VISUAL ENHANCEMENT HELPERS
--- ════════════════════════════════════════════════════════════════════════
-
-local function AddDropShadow(element, depth, transparency)
-    depth = depth or 6
-    transparency = transparency or 0.6
-    
-    local shadow = CreateElement("ImageLabel", {
-        Name = "DropShadow",
-        Parent = element,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, -depth, 0, -depth),
-        Size = UDim2.new(1, depth * 2, 1, depth * 2),
-        Image = "rbxassetid://6014261993",
-        ImageColor3 = Color3.fromRGB(0, 0, 0),
-        ImageTransparency = transparency,
-        ScaleType = Enum.ScaleType.Slice,
-        SliceCenter = Rect.new(49, 49, 450, 450),
-        ZIndex = element.ZIndex - 1
-    })
-    return shadow
-end
-
-local function AddGlowEffect(element, color, intensity)
-    intensity = intensity or 0.4
-    color = color or Theme.Accent
-    
-    local glow = CreateElement("Frame", {
-        Name = "Glow",
-        Parent = element,
-        BackgroundColor3 = color,
-        BackgroundTransparency = 1 - intensity,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, -3, 0, -3),
-        Size = UDim2.new(1, 6, 1, 6),
-        ZIndex = element.ZIndex - 1
-    })
-    
-    CreateElement("UICorner", {
-        Parent = glow,
-        CornerRadius = UDim.new(0, 12)
-    })
-    
-    local blur = CreateElement("UIGradient", {
-        Parent = glow,
-        Transparency = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 0),
-            NumberSequenceKeypoint.new(1, 1)
-        })
-    })
-    
-    return glow
-end
-
-local function AddGradientBackground(element, color1, color2, rotation)
-    rotation = rotation or 90
-    color1 = color1 or Theme.Accent
-    color2 = color2 or Theme.AccentDark
-    
-    local gradient = CreateElement("UIGradient", {
-        Parent = element,
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, color1),
-            ColorSequenceKeypoint.new(1, color2)
-        }),
-        Rotation = rotation
-    })
-    return gradient
-end
-
 
 local function RGBtoHSV(r, g, b)
     r, g, b = r / 255, g / 255, b / 255
@@ -446,9 +376,9 @@ function Library:CreateWindow(config)
     
     task.spawn(function()
         while ScreenGui.Parent do
-            Tween(StatusIndicator, {Size = UDim2.new(0, 12, 0, 12)}, 1, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
+            Tween(StatusIndicator, {Size = UDim2.new(0, 12, 0, 12)}, 1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
             task.wait(1)
-            Tween(StatusIndicator, {Size = UDim2.new(0, 10, 0, 10)}, 1, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
+            Tween(StatusIndicator, {Size = UDim2.new(0, 10, 0, 10)}, 1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
             task.wait(1)
         end
     end)
@@ -1021,16 +951,6 @@ function Library:CreateWindow(config)
             end
             
             -- ════════════════════════════════════════════════════════════════════════
-            
-            -- ════════════════════════════════════════════════════════════════════════
-            -- ULTRA CLEAN TOGGLE ENHANCEMENTS  
-            -- • Modern pill switch (44x24px)
-            -- • Gradient fill with smooth color transition
-            -- • Circle animates with bounce (Quint easing)
-            -- • Hover: switch scales to 46x26px
-            -- • Active glow effect
-            -- ════════════════════════════════════════════════════════════════════════
-
             -- TOGGLE ELEMENT (with Lock and ForceState)
             -- ════════════════════════════════════════════════════════════════════════
             
@@ -1055,7 +975,7 @@ function Library:CreateWindow(config)
                 
                 CreateElement("UICorner", {
                     Parent = Toggle,
-                    CornerRadius = UDim.new(0, 10)
+                    CornerRadius = UDim.new(0, 8)
                 })
                 
                 local ToggleStroke = CreateElement("UIStroke", {
@@ -1173,16 +1093,6 @@ function Library:CreateWindow(config)
             end
             
             -- ════════════════════════════════════════════════════════════════════════
-            
-            -- ════════════════════════════════════════════════════════════════════════
-            -- ULTRA CLEAN SLIDER ENHANCEMENTS
-            -- • Gradient fill bar with smooth transitions
-            -- • Larger handle (18px) with shadow
-            -- • Hover: handle scales to 22px with bounce
-            -- • Inner glow on handle
-            -- • Value displays in accent color
-            -- ════════════════════════════════════════════════════════════════════════
-
             -- SLIDER ELEMENT (with Lock)
             -- ════════════════════════════════════════════════════════════════════════
             
@@ -1211,7 +1121,7 @@ function Library:CreateWindow(config)
                 
                 CreateElement("UICorner", {
                     Parent = Slider,
-                    CornerRadius = UDim.new(0, 10)
+                    CornerRadius = UDim.new(0, 8)
                 })
                 
                 local SliderStroke = CreateElement("UIStroke", {
@@ -1403,7 +1313,7 @@ function Library:CreateWindow(config)
                 
                 CreateElement("UICorner", {
                     Parent = Dropdown,
-                    CornerRadius = UDim.new(0, 10)
+                    CornerRadius = UDim.new(0, 8)
                 })
                 
                 local DropdownStroke = CreateElement("UIStroke", {
@@ -1655,7 +1565,7 @@ function Library:CreateWindow(config)
                 
                 CreateElement("UICorner", {
                     Parent = Button,
-                    CornerRadius = UDim.new(0, 10)
+                    CornerRadius = UDim.new(0, 8)
                 })
                 
                 local ButtonStroke = CreateElement("UIStroke", {
@@ -1760,7 +1670,7 @@ function Library:CreateWindow(config)
                 
                 CreateElement("UICorner", {
                     Parent = Textbox,
-                    CornerRadius = UDim.new(0, 10)
+                    CornerRadius = UDim.new(0, 8)
                 })
                 
                 local TextboxStroke = CreateElement("UIStroke", {
@@ -2543,7 +2453,7 @@ function Library:CreateWindow(config)
         })
         
         -- Animate in with smooth slide effect
-        local slideIn = Tween(Notification, {Position = UDim2.new(0, 0, 0, 0)}, 0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        local slideIn = Tween(Notification, {Position = UDim2.new(0, 0, 0, 0)}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         local fadeIn = Tween(InnerFrame, {BackgroundTransparency = 0}, 0.3)
         
         -- Progress bar animation
@@ -2553,7 +2463,7 @@ function Library:CreateWindow(config)
         -- Close function
         local function CloseNotification()
             progressTween:Cancel()
-            Tween(Notification, {Position = UDim2.new(1, 50, 0, 0)}, 0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+            Tween(Notification, {Position = UDim2.new(1, 50, 0, 0)}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
             Tween(InnerFrame, {BackgroundTransparency = 1}, 0.3)
             task.wait(0.3)
             Notification:Destroy()
