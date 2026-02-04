@@ -2248,248 +2248,77 @@ function Library:CreateWindow(config)
             Error = Theme.Error
         }
         
-        local TypeIcons = {
-            Info = "ℹ️",
-            Success = "✓",
-            Warning = "⚠",
-            Error = "✕"
-        }
-        
-        -- Modern notification container
         local Notification = CreateElement("Frame", {
             Name = "Notification",
             Parent = ScreenGui,
-            Position = UDim2.new(1, 20, 1, -120),
-            Size = UDim2.new(0, 340, 0, 0),
-            BackgroundColor3 = Theme.Background,
-            BorderSizePixel = 0,
-            ZIndex = 1000,
-            ClipsDescendants = true,
-            AutomaticSize = Enum.AutomaticSize.Y
-        })
-        
-        CreateElement("UICorner", {
-            Parent = Notification,
-            CornerRadius = UDim.new(0, 12)
-        })
-        
-        -- Outer glow stroke
-        local NotifStroke = CreateElement("UIStroke", {
-            Parent = Notification,
-            Color = TypeColors[Type] or Theme.Accent,
-            Thickness = 1.5,
-            Transparency = 0.3
-        })
-        
-        -- Inner shadow effect
-        local InnerShadow = CreateElement("Frame", {
-            Name = "Shadow",
-            Parent = Notification,
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-            BackgroundTransparency = 0.4,
+            Position = UDim2.new(1, 10, 1, -100),
+            Size = UDim2.new(0, 280, 0, 70),
+            BackgroundColor3 = Theme.Secondary,
             BorderSizePixel = 0,
             ZIndex = 1000
         })
         
         CreateElement("UICorner", {
-            Parent = InnerShadow,
-            CornerRadius = UDim.new(0, 12)
-        })
-        
-        -- Main content container with padding
-        local ContentContainer = CreateElement("Frame", {
-            Name = "Content",
             Parent = Notification,
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
-            ZIndex = 1001
+            CornerRadius = UDim.new(0, 8)
         })
         
-        CreateElement("UIPadding", {
-            Parent = ContentContainer,
-            PaddingLeft = UDim.new(0, 18),
-            PaddingRight = UDim.new(0, 18),
-            PaddingTop = UDim.new(0, 16),
-            PaddingBottom = UDim.new(0, 16)
-        })
-        
-        CreateElement("UIListLayout", {
-            Parent = ContentContainer,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 8)
-        })
-        
-        -- Accent bar on left side (modern vertical accent)
-        local AccentBar = CreateElement("Frame", {
-            Name = "AccentBar",
+        local NotifStroke = CreateElement("UIStroke", {
             Parent = Notification,
-            Size = UDim2.new(0, 5, 1, 0),
+            Color = TypeColors[Type] or Theme.Accent,
+            Thickness = 2
+        })
+        
+        local ColorBar = CreateElement("Frame", {
+            Name = "Bar",
+            Parent = Notification,
+            Size = UDim2.new(0, 4, 1, 0),
             BackgroundColor3 = TypeColors[Type] or Theme.Accent,
-            BorderSizePixel = 0,
-            ZIndex = 1002
-        })
-        
-        CreateElement("UICorner", {
-            Parent = AccentBar,
-            CornerRadius = UDim.new(0, 12)
-        })
-        
-        -- Gradient on accent bar for extra polish
-        local AccentGradient = CreateElement("UIGradient", {
-            Parent = AccentBar,
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, TypeColors[Type] or Theme.Accent),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(
-                    math.min(255, (TypeColors[Type] or Theme.Accent).R * 255 * 1.2),
-                    math.min(255, (TypeColors[Type] or Theme.Accent).G * 255 * 1.2),
-                    math.min(255, (TypeColors[Type] or Theme.Accent).B * 255 * 1.2)
-                ))
-            }),
-            Rotation = 90
-        })
-        
-        -- Icon container
-        local IconContainer = CreateElement("Frame", {
-            Name = "IconContainer",
-            Parent = ContentContainer,
-            Size = UDim2.new(1, 0, 0, 32),
-            BackgroundTransparency = 1,
-            LayoutOrder = 1,
-            ZIndex = 1001
-        })
-        
-        -- Icon circle background
-        local IconCircle = CreateElement("Frame", {
-            Name = "IconCircle",
-            Parent = IconContainer,
-            Position = UDim2.new(0, 0, 0, 0),
-            Size = UDim2.new(0, 32, 0, 32),
-            BackgroundColor3 = TypeColors[Type] or Theme.Accent,
-            BackgroundTransparency = 0.85,
             BorderSizePixel = 0,
             ZIndex = 1001
         })
         
         CreateElement("UICorner", {
-            Parent = IconCircle,
-            CornerRadius = UDim.new(1, 0)
+            Parent = ColorBar,
+            CornerRadius = UDim.new(0, 8)
         })
         
-        -- Icon text
-        local Icon = CreateElement("TextLabel", {
-            Name = "Icon",
-            Parent = IconCircle,
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
-            Text = TypeIcons[Type] or "ℹ️",
-            TextColor3 = TypeColors[Type] or Theme.Accent,
-            TextSize = 18,
-            Font = Enum.Font.GothamBold,
-            ZIndex = 1002
-        })
-        
-        -- Title with icon space offset
         local NotifTitle = CreateElement("TextLabel", {
             Name = "Title",
-            Parent = IconContainer,
-            Position = UDim2.new(0, 42, 0, 0),
-            Size = UDim2.new(1, -42, 1, 0),
+            Parent = Notification,
+            Position = UDim2.new(0, 15, 0, 8),
+            Size = UDim2.new(1, -30, 0, 18),
             BackgroundTransparency = 1,
             Text = Title,
             TextColor3 = Theme.Text,
-            TextSize = 16,
+            TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
             Font = Enum.Font.GothamBold,
             ZIndex = 1001
         })
         
-        -- Content text
         local NotifContent = CreateElement("TextLabel", {
-            Name = "ContentText",
-            Parent = ContentContainer,
-            Size = UDim2.new(1, 0, 0, 0),
+            Name = "Content",
+            Parent = Notification,
+            Position = UDim2.new(0, 15, 0, 28),
+            Size = UDim2.new(1, -30, 1, -36),
             BackgroundTransparency = 1,
             Text = Content,
             TextColor3 = Theme.TextDark,
-            TextSize = 14,
+            TextSize = 11,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
             Font = Enum.Font.Gotham,
             TextWrapped = true,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            LayoutOrder = 2,
             ZIndex = 1001
         })
         
-        -- Progress bar at bottom
-        local ProgressBarBG = CreateElement("Frame", {
-            Name = "ProgressBG",
-            Parent = ContentContainer,
-            Size = UDim2.new(1, 0, 0, 3),
-            BackgroundColor3 = Theme.Tertiary,
-            BorderSizePixel = 0,
-            LayoutOrder = 3,
-            ZIndex = 1001
-        })
-        
-        CreateElement("UICorner", {
-            Parent = ProgressBarBG,
-            CornerRadius = UDim.new(1, 0)
-        })
-        
-        local ProgressBar = CreateElement("Frame", {
-            Name = "Progress",
-            Parent = ProgressBarBG,
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = TypeColors[Type] or Theme.Accent,
-            BorderSizePixel = 0,
-            ZIndex = 1002
-        })
-        
-        CreateElement("UICorner", {
-            Parent = ProgressBar,
-            CornerRadius = UDim.new(1, 0)
-        })
-        
-        -- Smooth slide-in animation with bounce
-        Notification.Position = UDim2.new(1, 20, 1, -120)
-        Tween(Notification, {Position = UDim2.new(1, -360, 1, -120)}, 0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-        
-        -- Animate progress bar
-        task.spawn(function()
-            task.wait(0.5)
-            Tween(ProgressBar, {Size = UDim2.new(0, 0, 1, 0)}, Duration, Enum.EasingStyle.Linear)
-        end)
-        
-        -- Pulse animation on icon
-        task.spawn(function()
-            task.wait(0.3)
-            for i = 1, 2 do
-                Tween(IconCircle, {Size = UDim2.new(0, 36, 0, 36)}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                task.wait(0.3)
-                Tween(IconCircle, {Size = UDim2.new(0, 32, 0, 32)}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-                task.wait(0.3)
-            end
-        end)
+        Tween(Notification, {Position = UDim2.new(1, -290, 1, -100)}, 0.4, Enum.EasingStyle.Back)
         
         task.wait(Duration)
         
-        -- Smooth slide-out animation
-        Tween(Notification, {Position = UDim2.new(1, 20, 1, -120)}, 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In)
-        Tween(Notification, {BackgroundTransparency = 1}, 0.4)
-        Tween(InnerShadow, {BackgroundTransparency = 1}, 0.4)
-        Tween(NotifStroke, {Transparency = 1}, 0.4)
-        Tween(AccentBar, {BackgroundTransparency = 1}, 0.4)
-        Tween(IconCircle, {BackgroundTransparency = 1}, 0.4)
-        Tween(Icon, {TextTransparency = 1}, 0.4)
-        Tween(NotifTitle, {TextTransparency = 1}, 0.4)
-        Tween(NotifContent, {TextTransparency = 1}, 0.4)
-        Tween(ProgressBarBG, {BackgroundTransparency = 1}, 0.4)
-        Tween(ProgressBar, {BackgroundTransparency = 1}, 0.4)
-        
-        task.wait(0.4)
+        Tween(Notification, {Position = UDim2.new(1, 10, 1, -100)}, 0.3)
+        task.wait(0.3)
         Notification:Destroy()
     end
     
